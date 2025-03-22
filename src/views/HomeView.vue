@@ -276,7 +276,7 @@ onMounted(async () => {
       inputPattern: /^[a-z0-9]{256}$/,
       inputErrorMessage: "请输入内容"
     }).then(async ({ value }) => {
-      setToken(store.token);
+      api.defaults.headers.common["Authorization"] = `bearer ${store.token}`;
       store.token = value;
     });
   }

@@ -260,7 +260,7 @@ const watermarkTextWatch = debounce(async () => {
     imageViewerList.value = imgs;
     imgTextDisabled.value = false;
   }
-}, 300);
+}, 500);
 
 onMounted(async () => {
   screenBox.value.style.height = "30px";

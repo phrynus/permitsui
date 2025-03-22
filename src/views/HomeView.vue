@@ -7,6 +7,7 @@ import { watermarkTextStore } from "@/stores/watermarkText";
 import api from "@/utils/axios";
 import { ElMessage, ElLoading, ElMessageBox, ElNotification, ElIcon } from "element-plus";
 import "wc-waterfall";
+import { setToken } from "@/utils/axios";
 
 const store: any = userestStore();
 const watermarkText: any = watermarkTextStore();
@@ -275,6 +276,7 @@ onMounted(async () => {
       inputPattern: /^[a-z0-9]{256}$/,
       inputErrorMessage: "请输入内容"
     }).then(async ({ value }) => {
+      setToken(store.token);
       store.token = value;
     });
   }

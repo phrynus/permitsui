@@ -1,0 +1,115 @@
+// 插入字体 //o-web.s3.bitiful.net/Fonts/Nunito.ttf
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('https://o-web.s3.bitiful.net/Fonts/Nunito.ttf') format('truetype');
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  // 微软雅黑
+  font-family: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, BlinkMacSystemFont,
+    Helvetica Neue, Arial, PingFang SC, PingFang TC, PingFang HK, Microsoft Yahei, Microsoft JhengHei;
+  // 思源黑体
+  // font-family: "Nunito", "SF Pro SC", "SF Pro Text", "SF Pro Icons", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #fefefe;
+  color: #333;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+ul {
+  list-style: none;
+}
+img {
+  display: block;
+}
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+.container {
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 720px) {
+  .container {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1520px;
+  }
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 999px;
+  background: rgba(64, 64, 64, 0.25);
+  transition: all 0.3s;
+  backdrop-filter: blur(10px);
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  &:after {
+    font-size: 12px !important;
+    color: #fff;
+  }
+}
+.swiper-pagination-bullet {
+  margin: 0 3px !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  opacity: 0.5 !important;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.25)) !important;
+  &.swiper-pagination-bullet-active {
+    opacity: 1 !important;
+    background: #fff !important;
+  }
+}

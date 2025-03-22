@@ -238,22 +238,16 @@ const watermark = (text: string, blob: string): Promise<string> => {
 
 function debounce(fn: Function, wait: number) {
   let timeout: number | undefined;
-  return function () {
-    let that = this;
-    let arg = arguments;
+  return function (this: any, ...args: any[]) {
+    const that = this;
     clearTimeout(timeout);
-    timeout = setTimeout(function () {
+    timeout = setTimeout(() => {
       timeout = undefined;
-      fn.apply(that, arg); //使用apply改变this指向
+      fn.apply(that, args);
     }, wait);
   };
 }
-const storeWatch = debounce(async () => {
-  isApiGo.value = false;
-  screenBox.value.style.height = "30px";
-  page.value = 1;
-  await apiGo();
-}, 300);
+
 const watermarkTextWatch = debounce(async () => {
   if (imageViewerShow.value) {
     imgTextDisabled.value = true;
@@ -292,7 +286,10 @@ onMounted(async () => {
   await apiGo();
 
   watch(store, async (newVal, oldVal) => {
-    storeWatch();
+    isApiGo.value = false;
+    screenBox.value.style.height = "30px";
+    page.value = 1;
+    await apiGo();
   });
   watch(watermarkText, async (newVal, oldVal) => {
     watermarkTextWatch();

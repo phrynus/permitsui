@@ -4,7 +4,7 @@ import qs from "qs";
 import Icon from "@/components/Icon.vue";
 import { userestStore } from "@/stores/rest";
 import { watermarkTextStore } from "@/stores/watermarkText";
-import api from "@/utils/axios";
+import axios from "axios";
 import { ElMessage, ElLoading, ElMessageBox, ElNotification, ElIcon } from "element-plus";
 import "wc-waterfall";
 import { setToken } from "@/utils/axios";
@@ -109,13 +109,19 @@ const apiGo = async (load = true) => {
   }
 
   try {
-    await api.get(`/api/permits?${getQuery()}`).then((res: any) => {
-      if (load) {
-        moulds.value = res.data.data;
-      } else {
-        moulds.value = [...moulds.value, ...res.data.data];
-      }
-    });
+    await axios
+      .get(`https://strapi.gommd.com/api/permits?${getQuery()}`, {
+        headers: {
+          Authorization: `Bearer ${store.token}`
+        }
+      })
+      .then((res: any) => {
+        if (load) {
+          moulds.value = res.data.data;
+        } else {
+          moulds.value = [...moulds.value, ...res.data.data];
+        }
+      });
     page.value++;
     if (load && loading) {
       loading.close();
@@ -276,7 +282,6 @@ onMounted(async () => {
       inputPattern: /^[a-z0-9]{256}$/,
       inputErrorMessage: "请输入内容"
     }).then(async ({ value }) => {
-      api.defaults.headers.common["Authorization"] = `bearer ${store.token}`;
       store.token = value;
     });
   }

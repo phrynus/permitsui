@@ -50,6 +50,7 @@ const isApiGo = ref(false);
 const imageViewerShow = ref(false);
 const imageViewerList = ref([]);
 const imageViewerId = ref();
+const imageViewerName = ref();
 const imgTextDisabled = ref(false);
 
 const screen = () => {
@@ -174,6 +175,7 @@ const goMoulds = async (id: any) => {
   imageViewerShow.value = true;
   imageViewerList.value = imgs;
   imageViewerId.value = id;
+  imageViewerName.value = mould.company;
 };
 
 const watermark = (text: string, blob: string): Promise<string> => {
@@ -232,7 +234,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       }
 
       // 将Canvas转换回Base64编码的图片
-      const watermarkedImage = canvas.toDataURL("image/png");
+      const watermarkedImage = canvas.toDataURL("image/jpeg");
       resolve(watermarkedImage); // 返回带有水印的Base64图片
     };
 
@@ -268,6 +270,30 @@ const watermarkTextWatch = debounce(async () => {
     imgTextDisabled.value = false;
   }
 }, 500);
+
+const download = (index: number) => {
+  const url = imageViewerList.value[index] as string;
+  let filename = "";
+  console.log(url, filename);
+  if (url[0] == "h") {
+    filename = index + "-" + imageViewerName.value + url.slice(url.lastIndexOf("."));
+  } else {
+    filename = index + "-" + imageViewerName.value + ".jpeg";
+  }
+
+  fetch(url)
+    .then((response) => response.blob())
+    .then((blob) => {
+      const blobUrl = URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      URL.revokeObjectURL(blobUrl);
+      link.remove();
+    });
+};
 
 onMounted(async () => {
   screenBox.value.style.height = "30px";
@@ -357,14 +383,14 @@ onMounted(async () => {
       show-progress
       hide-on-click-modal
     >
-      <template #toolbar="{ prev, next }">
+      <template #toolbar="{ activeIndex }">
         <el-input
           class="imageViewerInput"
           :disabled="imgTextDisabled"
           v-model="watermarkText.text"
           style="width: 240px"
         />
-        <Icon name="icondownload" />
+        <Icon @click="download(activeIndex)" name="icondownload" />
       </template>
     </el-image-viewer>
   </el-scrollbar>

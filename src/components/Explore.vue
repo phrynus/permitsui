@@ -89,7 +89,7 @@ onMounted(() => {
   }
   @media screen and (max-width: 768px) {
     position: fixed;
-    z-index: 99999;
+    z-index: 2000;
     background-color: #fff;
     height: auto;
     flex-direction: row;

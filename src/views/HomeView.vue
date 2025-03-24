@@ -84,7 +84,7 @@ const getQuery = () => {
     {
       filters,
       populate: "imgs",
-      sort: "id:desc",
+      sort: "createdAt:desc",
       pagination: {
         page: page.value,
         pageSize: pageSize.value

@@ -275,7 +275,7 @@ const download = (index: number) => {
   const url = imageViewerList.value[index] as string;
   // 正则替换 imageViewerMould.value.area 前三个字符为空
   let filename =
-    imageViewerMould.value.area.replace(/^[a-z0-9]{3}/, "") + "_" + imageViewerMould.value.company + "_" + index;
+    imageViewerMould.value.area.replace(/^[\s\S]{4}/, "") + "_" + imageViewerMould.value.company + "_" + index;
   if (url[0] == "h") {
     filename += url.slice(url.lastIndexOf("."));
   } else {

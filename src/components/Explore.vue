@@ -29,26 +29,32 @@ onMounted(() => {
       <div class="explore">
         <div class="item index" :class="store.explore == '' ? 'on' : ''">
           <a @click="setExplore('')">
-            <Icon name="iconcode" />
+            <Icon name="iconhome-filling" />
             <span>全部</span>
           </a>
         </div>
         <div class="item a" :class="store.explore == 'A' ? 'on' : ''">
           <a @click="setExplore('A')">
-            <Icon name="iconcode" />
-            <span>许可证</span>
+            <Icon name="iconsurvey" />
+            <span>许可</span>
           </a>
         </div>
         <div class="item b" :class="store.explore == 'B' ? 'on' : ''">
           <a @click="setExplore('B')">
-            <Icon name="iconcode" />
-            <span>受理通知书</span>
+            <Icon name="iconimage-text" />
+            <span>受理</span>
           </a>
         </div>
         <div class="item c" :class="store.explore == 'C' ? 'on' : ''">
           <a @click="setExplore('C')">
-            <Icon name="iconcode" />
-            <span>批准通知书</span>
+            <Icon name="iconimage-text" />
+            <span>批准</span>
+          </a>
+        </div>
+        <div class="item c">
+          <a>
+            <Icon name="iconedit" />
+            <span>简述</span>
           </a>
         </div>
 

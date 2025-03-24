@@ -354,7 +354,7 @@ onMounted(async () => {
       <div class="moulds" v-for="item in moulds" :key="item.documentId">
         <a @click="goMoulds(item.documentId)">
           <div class="img">
-            <el-image :src="item.imgs[0]?.formats.medium.url" lazy />
+            <el-image :src="item.imgs[0]?.formats.medium.url" />
           </div>
           <div class="mold-footer">
             <div class="title" v-text="item.company"></div>

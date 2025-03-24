@@ -52,6 +52,7 @@ const imageViewerList = ref([]);
 const imageViewerId = ref();
 const imageViewerMould = ref();
 const imgTextDisabled = ref(false);
+const imgMosaic = ref(false);
 
 const screen = () => {
   if (screenBox.value.clientHeight > 50) {
@@ -265,7 +266,6 @@ function debounce(fn: Function, wait: number) {
     }, wait);
   };
 }
-
 const watermarkTextWatch = debounce(async () => {
   if (imageViewerShow.value) {
     imgTextDisabled.value = true;
@@ -279,7 +279,6 @@ const watermarkTextWatch = debounce(async () => {
     imgTextDisabled.value = false;
   }
 }, 500);
-
 const download = (index: number) => {
   const url = imageViewerList.value[index] as string;
   // 正则替换 imageViewerMould.value.area 前三个字符为空
@@ -303,6 +302,33 @@ const download = (index: number) => {
       URL.revokeObjectURL(blobUrl);
       link.remove();
     });
+};
+
+const isLongPress = ref(false);
+let pressTimer: any = null;
+
+const startPress = () => {
+  isLongPress.value = false;
+  pressTimer = setTimeout(() => {
+    isLongPress.value = true;
+    console.log("触发长按事件");
+  }, 500); // 长按阈值
+};
+
+const cancelPress = () => {
+  if (pressTimer) {
+    clearTimeout(pressTimer);
+    pressTimer = null;
+  }
+};
+
+const handleClick = (event: any) => {
+  if (isLongPress.value) {
+    event.preventDefault(); // 阻止 click 事件
+    return;
+  }
+  console.log("触发点击事件");
+  imgMosaic.value = !imgMosaic.value;
 };
 
 onMounted(async () => {
@@ -400,6 +426,31 @@ onMounted(async () => {
           v-model="watermarkText.text"
           style="width: 240px"
         />
+        <el-tooltip class="box-item" effect="light" enterable="false" content="点击打码/长按修改打码" placement="top">
+          <Icon
+            @mousedown="startPress"
+            @mouseup="cancelPress"
+            @mouseleave="cancelPress"
+            @touchstart="startPress"
+            @touchend="cancelPress"
+            @touchcancel="cancelPress"
+            @click="handleClick"
+            v-if="imgMosaic"
+            name="iconicomosaic"
+          />
+          <Icon
+            @mousedown="startPress"
+            @mouseup="cancelPress"
+            @mouseleave="cancelPress"
+            @touchstart="startPress"
+            @touchend="cancelPress"
+            @touchcancel="cancelPress"
+            @click="handleClick"
+            v-else="imgMosaic"
+            name="iconicomosaic-ash"
+          />
+        </el-tooltip>
+
         <Icon @click="download(activeIndex)" name="icondownload" />
       </template>
     </el-image-viewer>
@@ -407,6 +458,9 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+.box-item * {
+  outline: initial;
+}
 .home {
   position: relative;
   padding-top: 10px;

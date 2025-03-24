@@ -14,6 +14,7 @@ declare module 'vue' {
     ElImageViewer: typeof import('element-plus/es')['ElImageViewer']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElScrollbar: typeof import('element-plus/es')['ElScrollbar']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     Explore: typeof import('./src/components/Explore.vue')['default']
     Icon: typeof import('./src/components/Icon.vue')['default']
     Nav: typeof import('./src/components/Nav.vue')['default']

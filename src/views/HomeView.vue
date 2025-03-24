@@ -50,7 +50,7 @@ const isApiGo = ref(false);
 const imageViewerShow = ref(false);
 const imageViewerList = ref([]);
 const imageViewerId = ref();
-const imageViewerName = ref();
+const imageViewerMould = ref();
 const imgTextDisabled = ref(false);
 
 const screen = () => {
@@ -175,7 +175,7 @@ const goMoulds = async (id: any) => {
   imageViewerShow.value = true;
   imageViewerList.value = imgs;
   imageViewerId.value = id;
-  imageViewerName.value = mould.company;
+  imageViewerMould.value = mould;
 };
 
 const watermark = (text: string, blob: string): Promise<string> => {
@@ -273,12 +273,11 @@ const watermarkTextWatch = debounce(async () => {
 
 const download = (index: number) => {
   const url = imageViewerList.value[index] as string;
-  let filename = "";
-  console.log(url, filename);
+  let filename = index + "_" + imageViewerMould.value.company;
   if (url[0] == "h") {
-    filename = index + "-" + imageViewerName.value + url.slice(url.lastIndexOf("."));
+    filename += url.slice(url.lastIndexOf("."));
   } else {
-    filename = index + "-" + imageViewerName.value + ".jpeg";
+    filename += ".jpeg";
   }
 
   fetch(url)

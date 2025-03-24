@@ -11,7 +11,7 @@ const store: any = userestStore();
 
 const input = ref();
 const btn = ref();
-const name = ref("EYES");
+const name = ref("许可证库");
 const searchgo = ref(false);
 const searchgo2 = ref(false);
 
@@ -28,7 +28,19 @@ const mobileSearch = (text: string) => {
     ElMessage.warning("请输入搜索内容");
   }
 };
-
+const btnSousuo = () => {
+  if (document.body.clientWidth < 768) {
+    if (searchgo2.value) {
+      mobileSearch(input.value.value);
+    } else {
+      searchgo.value = true;
+      searchgo2.value = true;
+      input.value.focus();
+    }
+  } else {
+    mobileSearch(input.value.value);
+  }
+};
 // input监听焦点，失去时隐藏搜索框
 onMounted(() => {
   input.value.addEventListener("blur", () => {
@@ -39,19 +51,6 @@ onMounted(() => {
   });
   input.value.addEventListener("keydown", (e: any) => {
     if (e.keyCode == 13) {
-      mobileSearch(input.value.value);
-    }
-  });
-  btn.value.addEventListener("click", () => {
-    if (document.body.clientWidth < 768) {
-      if (searchgo2.value) {
-        mobileSearch(input.value.value);
-      } else {
-        searchgo.value = true;
-        searchgo2.value = true;
-        input.value.focus();
-      }
-    } else {
       mobileSearch(input.value.value);
     }
   });
@@ -66,15 +65,16 @@ onMounted(() => {
         </a>
       </div>
       <div class="search" :class="searchgo ? 'on' : ''">
-        <input type="text" name="key" id="" :value="store.search" ref="input" />
+        <input type="text" name="key" id="" placeholder="公司名称" :value="store.search" ref="input" />
         <div class="btn" ref="btn">
-          <Icon name="iconsousuo" />
+          <Icon v-if="!store.search" @click="btnSousuo" name="iconsousuo" />
+          <Icon v-else name="iconclose" @click="store.search = ''" />
         </div>
       </div>
       <div class="link">
-        <a href="https://work.weixin.qq.com/kfid/kfcab32b37de696f61d" class="wx">
-          <Icon name="iconwx" />
-          <span>联系开发者</span>
+        <a href="#/" class="wx">
+          <Icon name="iconedit" />
+          <span>上传</span>
         </a>
       </div>
     </div>
@@ -102,6 +102,7 @@ onMounted(() => {
       letter-spacing: 4px;
       padding-right: 10px;
       color: var(--el-color-success);
+      font-family: "ZCOOL KuaiLe";
     }
   }
   .search {

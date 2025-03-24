@@ -10,10 +10,10 @@ const store: any = userestStore();
 
 const setExplore = (name: string) => {
   store.explore = name;
-  store.search = "";
   if (!name) {
     store.tags = "";
     store.areas = "";
+    store.search = "";
   }
   if (route.path !== "/") {
     router.push("/");

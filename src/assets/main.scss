@@ -1,8 +1,16 @@
 // 插入字体 //o-web.s3.bitiful.net/Fonts/Nunito.ttf
 
 @font-face {
-  font-family: 'Nunito';
-  src: url('https://o-web.s3.bitiful.net/Fonts/Nunito.ttf') format('truetype');
+  font-family: "Nunito";
+  src: url("/fonts/Nunito.ttf") format("truetype");
+}
+// @font-face {
+//   font-family: "ZCOOL KuaiLe";
+//   src: url("/fonts/ZCOOLKuaiLe-Regular.ttf") format("truetype");
+// }
+@font-face {
+  font-family: "ZCOOL KuaiLe";
+  src: url("/fonts/ZCOOLKuaiLe-Regular-fontzipMin.ttf") format("truetype");
 }
 
 * {
@@ -13,14 +21,20 @@
 
 body {
   // 微软雅黑
-  font-family: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, BlinkMacSystemFont,
-    Helvetica Neue, Arial, PingFang SC, PingFang TC, PingFang HK, Microsoft Yahei, Microsoft JhengHei;
-  // 思源黑体
-  // font-family: "Nunito", "SF Pro SC", "SF Pro Text", "SF Pro Icons", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  // font-family: 'Nunito', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, BlinkMacSystemFont,
+  //   Helvetica Neue, Arial, PingFang SC, PingFang TC, PingFang HK, Microsoft Yahei, Microsoft JhengHei;
+  // font-family: "Nunito", monospace, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif,
+  //   Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, BlinkMacSystemFont, Helvetica Neue, Arial,
+  //   PingFang SC, PingFang TC, PingFang HK, Microsoft Yahei, Microsoft JhengHei;
+  font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, BlinkMacSystemFont, Helvetica Neue, Arial,
+    PingFang SC, PingFang TC, PingFang HK, Microsoft Yahei, Microsoft JhengHei !important;
+
   background-color: #fefefe;
   color: #333;
   font-size: 16px;
   overflow-x: hidden;
+  letter-spacing: 1px;
 }
 
 a {

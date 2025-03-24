@@ -61,7 +61,9 @@ const screen = () => {
   }
 };
 const getQuery = () => {
-  let filters: any = {
+  let filters: any = {};
+
+  filters = {
     $and: [
       {
         types: {
@@ -77,9 +79,15 @@ const getQuery = () => {
         type: {
           $contains: store.explore
         }
+      },
+      {
+        company: {
+          $contains: store.search
+        }
       }
     ]
   };
+
   let query = qs.stringify(
     {
       filters,
@@ -209,10 +217,11 @@ const watermark = (text: string, blob: string): Promise<string> => {
 
       // 设置水印文本的样式
       const fontSize = Math.max(canvas.width, canvas.height) / 60; // 根据图片尺寸动态调整字体大小
-      ctx.font = `${fontSize}px Arial`;
+      ctx.font = `${fontSize}px ZCOOL KuaiLe`;
       ctx.fillStyle = "rgba(0, 0, 0, 0.09)"; // 半透明白色
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      // 设置字体
 
       // 计算水印的平铺密度
       const textWidth = ctx.measureText(text).width;

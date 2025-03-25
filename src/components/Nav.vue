@@ -73,7 +73,7 @@ onMounted(() => {
       </div>
       <div class="link">
         <a href="#/" class="wx">
-          <Icon name="iconedit" />
+          <Icon name="iconshangchuan" />
           <span>上传</span>
         </a>
       </div>

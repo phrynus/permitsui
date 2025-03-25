@@ -386,7 +386,7 @@ onMounted(async () => {
   <el-scrollbar @scroll="scroll" class="home" ref="scrollbar">
     <div class="screenBox" ref="screenBox">
       <div class="screenBtn" @click="screen()">
-        <Icon name="iconedit-filling" />
+        <Icon name="iconedit" />
         <span>筛选</span>
       </div>
       <div class="tagsBox">
@@ -507,7 +507,7 @@ onMounted(async () => {
     @media screen and (max-width: 959px) {
       padding-right: 42px;
       .screenBtn {
-        padding: 0 8px !important;
+        padding: 0 6px !important;
         span {
           display: none;
         }
@@ -546,7 +546,7 @@ onMounted(async () => {
       }
     }
     .screenBtn {
-      padding: 0 20px;
+      padding: 0 16px;
       width: max-content;
       height: 30px;
       border-radius: 16px;
@@ -554,7 +554,7 @@ onMounted(async () => {
       line-height: 30px;
       font-size: 15px;
       background-color: var(--el-color-success);
-      font-weight: bold;
+      // font-weight: bold;
       color: #fff;
       position: absolute;
       right: 0;

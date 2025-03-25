@@ -1,7 +1,7 @@
 import "@/utils/axios";
 
 import "./assets/main.scss";
-import "//at.alicdn.com/t/c/font_4547657_twaa4rk73c.js";
+import "//at.alicdn.com/t/c/font_4547657_nhr8l6nr7.js";
 
 import { createApp } from "vue";
 import { createPinia } from "pinia";

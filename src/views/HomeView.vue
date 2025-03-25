@@ -7,7 +7,7 @@ import { watermarkTextStore } from "@/stores/watermarkText";
 import axios from "axios";
 import { ElMessage, ElLoading, ElMessageBox, ElNotification, ElIcon } from "element-plus";
 import "wc-waterfall";
-import { setToken } from "@/utils/axios";
+import DrawCanvas from "@/components/DrawCanvas.vue";
 
 const store: any = userestStore();
 const watermarkText: any = watermarkTextStore();
@@ -47,12 +47,21 @@ const areas = ref([
 const page = ref(1);
 const pageSize = ref(24);
 const isApiGo = ref(false);
+const imageViewerIndex = ref(0);
 const imageViewerShow = ref(false);
 const imageViewerList = ref([]);
 const imageViewerId = ref();
 const imageViewerMould = ref();
 const imgTextDisabled = ref(false);
-const imgMosaic = ref(false);
+const drawCanvasShow = ref(false);
+const drawCanvasWidth = ref(100);
+const drawCanvasHeight = ref(100);
+
+// const switchImage = ;
+
+const rectangles = (e: any) => {
+  console.log(e);
+};
 
 const screen = () => {
   if (screenBox.value.clientHeight > 50) {
@@ -185,6 +194,7 @@ const goMoulds = async (id: any) => {
   imageViewerList.value = imgs;
   imageViewerId.value = id;
   imageViewerMould.value = mould;
+  imageViewerIndex.value = 0;
 };
 
 const watermark = (text: string, blob: string): Promise<string> => {
@@ -306,29 +316,36 @@ const download = (index: number) => {
 
 const isLongPress = ref(false);
 let pressTimer: any = null;
-
-const startPress = () => {
-  isLongPress.value = false;
-  pressTimer = setTimeout(() => {
-    isLongPress.value = true;
-    console.log("触发长按事件");
-  }, 500); // 长按阈值
-};
-
 const cancelPress = () => {
   if (pressTimer) {
     clearTimeout(pressTimer);
     pressTimer = null;
   }
 };
+const startPress = () => {
+  isLongPress.value = false;
+  pressTimer = setTimeout(() => {
+    isLongPress.value = true;
+    // 触发长按事件
 
+    if (imageViewerShow.value) {
+      ElMessage({
+        message: "点击范围外退出"
+      });
+      drawCanvasShow.value = true;
+      let img = document.querySelectorAll(".home .el-image-viewer__canvas img")[imageViewerIndex.value];
+      drawCanvasWidth.value = img.clientWidth;
+      drawCanvasHeight.value = img.clientHeight;
+    }
+  }, 300);
+};
 const handleClick = (event: any) => {
   if (isLongPress.value) {
     event.preventDefault(); // 阻止 click 事件
     return;
   }
   console.log("触发点击事件");
-  imgMosaic.value = !imgMosaic.value;
+  watermarkText.mosaic = !watermarkText.mosaic;
 };
 
 onMounted(async () => {
@@ -414,10 +431,10 @@ onMounted(async () => {
     <el-image-viewer
       v-if="imageViewerShow"
       @close="imageViewerShow = false"
-      :initial-index="0"
       :url-list="imageViewerList"
       show-progress
       hide-on-click-modal
+      @switch="(i: number) => imageViewerIndex = i"
     >
       <template #toolbar="{ activeIndex }">
         <el-input
@@ -426,7 +443,7 @@ onMounted(async () => {
           v-model="watermarkText.text"
           style="width: 240px"
         />
-        <el-tooltip class="box-item" effect="light" enterable="false" content="点击打码/长按修改打码" placement="top">
+        <el-tooltip class="box-item" effect="light" :enterable="false" content="点击打码/长按修改打码" placement="top">
           <Icon
             @mousedown="startPress"
             @mouseup="cancelPress"
@@ -435,7 +452,7 @@ onMounted(async () => {
             @touchend="cancelPress"
             @touchcancel="cancelPress"
             @click="handleClick"
-            v-if="imgMosaic"
+            v-if="watermarkText.mosaic"
             name="iconicomosaic"
           />
           <Icon
@@ -446,14 +463,20 @@ onMounted(async () => {
             @touchend="cancelPress"
             @touchcancel="cancelPress"
             @click="handleClick"
-            v-else="imgMosaic"
+            v-else="watermarkText.mosaic"
             name="iconicomosaic-ash"
           />
         </el-tooltip>
-
         <Icon @click="download(activeIndex)" name="icondownload" />
       </template>
     </el-image-viewer>
+    <DrawCanvas
+      v-if="drawCanvasShow"
+      @close="drawCanvasShow = false"
+      :width="drawCanvasWidth"
+      :height="drawCanvasHeight"
+      @rectangles="rectangles"
+    />
   </el-scrollbar>
 </template>
 

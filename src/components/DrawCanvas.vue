@@ -22,12 +22,7 @@ const state: {
   rectangles: []
 };
 // 接收传递的参数 添加事件
-const props: {
-  width: number;
-  height: number;
-  onRectangles: Function;
-  onClose: any;
-} = defineProps({
+const props = defineProps({
   width: {
     type: Number,
     default: 800
@@ -42,8 +37,8 @@ const props: {
   },
   // 添加事件 close
   onClose: {
-    type: Function,
-    default: (e: any) => {}
+    type: Function as any,
+    default: (e: MouseEvent) => {}
   }
 });
 
@@ -151,7 +146,7 @@ onMounted(() => {
 <template>
   <div class="draw-canvas-box">
     <canvas ref="drawCanvas"></canvas>
-    <div @click="onClose" class="bg"></div>
+    <div @click="props.onClose" class="bg"></div>
   </div>
 </template>
 <style lang="scss" scoped>

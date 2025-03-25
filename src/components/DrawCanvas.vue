@@ -22,7 +22,12 @@ const state: {
   rectangles: []
 };
 // 接收传递的参数 添加事件
-const props = defineProps({
+const props: {
+  width: number;
+  height: number;
+  onRectangles: Function;
+  onClose: any;
+} = defineProps({
   width: {
     type: Number,
     default: 800

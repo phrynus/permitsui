@@ -663,38 +663,45 @@ onMounted(async () => {
       <!-- 自定义工具栏 -->
       <template #toolbar="{ activeIndex }">
         <!-- 水印文字输入 -->
-        <el-input
-          class="imageViewerInput"
-          :disabled="imgTextDisabled"
-          v-model="imageViewerInputV"
-          @change="watermarkText.text = imageViewerInputV"
-          style="width: 240px"
-        />
-
-        <Icon
-          @click="
-            () => {
-              if (watermarkText.text != '') {
-                watermarkText.watermark = !watermarkText.watermark;
+        <el-tooltip content="水印文本,输入后回车确认" placement="top" effect="light">
+          <el-input
+            class="imageViewerInput"
+            :disabled="imgTextDisabled"
+            v-model="imageViewerInputV"
+            @change="watermarkText.text = imageViewerInputV"
+            style="width: 240px"
+          />
+        </el-tooltip>
+        <el-tooltip content="水印" placement="top" effect="light">
+          <Icon
+            :c="true"
+            @click="
+              () => {
+                if (watermarkText.text != '') {
+                  watermarkText.watermark = !watermarkText.watermark;
+                }
               }
-            }
-          "
-          :name="watermarkText.watermark && watermarkText.text != '' ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
-        />
-
-        <Icon
-          @mousedown="startPress"
-          @mouseup="cancelPress"
-          @mouseleave="cancelPress"
-          @touchstart="startPress"
-          @touchend="cancelPress"
-          @touchcancel="cancelPress"
-          @click="handleClick"
-          :name="watermarkText.mosaic ? 'iconicomosaic' : 'iconicomosaic-ash'"
-        />
-
+            "
+            :name="watermarkText.watermark && watermarkText.text != '' ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
+          />
+        </el-tooltip>
+        <el-tooltip content="打码 / 长按编辑打码" placement="top" effect="light">
+          <Icon
+            :c="true"
+            @mousedown="startPress"
+            @mouseup="cancelPress"
+            @mouseleave="cancelPress"
+            @touchstart="startPress"
+            @touchend="cancelPress"
+            @touchcancel="cancelPress"
+            @click="handleClick"
+            :name="watermarkText.mosaic ? 'iconicomosaic' : 'iconicomosaic-ash'"
+          />
+        </el-tooltip>
         <!-- 下载按钮 -->
-        <Icon @click="download(activeIndex)" name="icondownload" />
+        <el-tooltip content="下载" placement="top" effect="light">
+          <Icon :c="true" @click="download(activeIndex)" name="icondownload" />
+        </el-tooltip>
       </template>
     </el-image-viewer>
   </el-scrollbar>

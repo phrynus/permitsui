@@ -667,8 +667,14 @@ onMounted(async () => {
         />
 
         <Icon
-          @click="watermarkText.watermark = !watermarkText.watermark"
-          :name="watermarkText.watermark ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
+          @click="
+            () => {
+              if (watermarkText.text != '') {
+                watermarkText.watermark = !watermarkText.watermark;
+              }
+            }
+          "
+          :name="watermarkText.watermark && watermarkText.text != '' ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
         />
 
         <Icon

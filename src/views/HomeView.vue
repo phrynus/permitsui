@@ -303,7 +303,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // 添加文字水印
-      if (watermarkText.watermark || text != "") {
+      if (watermarkText.watermark && text != "") {
         const fontSize = Math.max(canvas.width, canvas.height) / 60;
         ctx.font = `${fontSize}px ZCOOL KuaiLe`;
         ctx.fillStyle = "rgba(0, 0, 0, 0.09)";

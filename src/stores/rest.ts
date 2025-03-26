@@ -9,7 +9,8 @@ export const userestStore = defineStore(
     const areas = ref("");
     const tags = ref("");
     const token = ref("");
-    return { explore, search, areas, tags, token };
+    const refresh = ref(false);
+    return { explore, search, areas, tags, token, refresh };
   },
   {
     persist: true

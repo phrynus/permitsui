@@ -14,6 +14,7 @@ const btn = ref();
 const name = ref("许可证库");
 const searchgo = ref(false);
 const searchgo2 = ref(false);
+const uploadPermitSwitch = ref(false);
 
 const mobileSearch = (text: string) => {
   if (text !== "") {
@@ -40,6 +41,10 @@ const btnSousuo = () => {
   } else {
     mobileSearch(input.value.value);
   }
+};
+//  uploadPermitClose
+const uploadPermitClose = () => {
+  uploadPermitSwitch.value = false;
 };
 // input监听焦点，失去时隐藏搜索框
 onMounted(() => {
@@ -72,13 +77,14 @@ onMounted(() => {
         </div>
       </div>
       <div class="link">
-        <a href="#/" class="wx">
+        <a href="javascript:;" @click="uploadPermitSwitch = true" class="wx">
           <Icon name="iconshangchuan" />
           <span>上传</span>
         </a>
       </div>
     </div>
   </div>
+  <UploadPermit :switch="uploadPermitSwitch" @close="uploadPermitClose" />
 </template>
 <style lang="scss" scoped>
 .nav {

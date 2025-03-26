@@ -96,8 +96,6 @@ const drawCanvasRectangles = ref<
   }[]
 >([]);
 
-const uploadPermitSwitch = ref(false);
-
 // ============== 核心功能方法 ==============
 
 /**
@@ -544,9 +542,6 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
   }
 };
 
-//  uploadPermitClose
-const uploadPermitClose = () => {};
-
 // ============== 生命周期钩子 ==============
 onMounted(async () => {
   // 初始化筛选框高度
@@ -701,7 +696,6 @@ onMounted(async () => {
     :height="drawCanvasHeight"
     :rectangles="drawCanvasRectangles"
   />
-  <UploadPermit :switch="uploadPermitSwitch" @close="uploadPermitClose" />
 </template>
 
 <style lang="scss" scoped>

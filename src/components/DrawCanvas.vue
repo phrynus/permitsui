@@ -2,6 +2,27 @@
 import { onMounted, ref, defineProps, watch } from "vue";
 const drawCanvas = ref<HTMLCanvasElement | null>(null);
 
+// 接收传递的参数 添加事件
+const props = defineProps({
+  width: {
+    type: Number,
+    default: 800
+  },
+  height: {
+    type: Number,
+    default: 600
+  },
+  rectangles: {
+    type: Array as any,
+    default: () => []
+  },
+  // 添加事件 close
+  onClose: {
+    type: Function as any,
+    default: (e: any) => {}
+  }
+});
+
 let ctx: any;
 let canvas: any;
 const state: {
@@ -19,28 +40,8 @@ const state: {
     x: 0,
     y: 0
   },
-  rectangles: []
+  rectangles: props.rectangles || []
 };
-// 接收传递的参数 添加事件
-const props = defineProps({
-  width: {
-    type: Number,
-    default: 800
-  },
-  height: {
-    type: Number,
-    default: 600
-  },
-  onRectangles: {
-    type: Function,
-    default: () => {}
-  },
-  // 添加事件 close
-  onClose: {
-    type: Function as any,
-    default: (e: MouseEvent) => {}
-  }
-});
 
 const getRatioPos = (e: any) => {
   const { left, top, width, height } = canvas.getBoundingClientRect();
@@ -118,7 +119,6 @@ const endDrawing = () => {
   }
   state.isDrawing = false;
   redraw();
-  props.onRectangles(state.rectangles);
 };
 
 // 初始化画布
@@ -127,6 +127,7 @@ const initCanvas = () => {
   canvas.height = props.height - 2;
   canvas.style.top = window.innerHeight / 2 - canvas.height / 2 - 2 + "px";
   canvas.style.left = window.innerWidth / 2 - canvas.width / 2 - 2 + "px";
+  redraw();
 };
 
 onMounted(() => {
@@ -146,7 +147,7 @@ onMounted(() => {
 <template>
   <div class="draw-canvas-box">
     <canvas ref="drawCanvas"></canvas>
-    <div @click="props.onClose" class="bg"></div>
+    <div @click="props.onClose(state.rectangles)" class="bg"></div>
   </div>
 </template>
 <style lang="scss" scoped>

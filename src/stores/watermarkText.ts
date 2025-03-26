@@ -5,7 +5,7 @@ export const watermarkTextStore = defineStore(
   "watermarkTextStore",
   () => {
     const text = ref("清欢");
-    const mosaic = ref(false);
+    const mosaic = ref(true);
 
     return { text, mosaic };
   },

@@ -255,7 +255,7 @@ const goMoulds = async (id: any) => {
 
     // 为每张图片添加水印
     for (const img of imgs) {
-      let w = await watermark(watermarkText || "", img);
+      let w = await watermark(watermarkText.text || "", img);
       imgs[imgs.indexOf(img)] = w;
     }
 

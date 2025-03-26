@@ -17,6 +17,7 @@ import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 import "wc-waterfall";
 // 自定义画布组件（用于打码区域编辑）
 import DrawCanvas from "@/components/DrawCanvas.vue";
+import UploadPermit from "@/components/UploadPermit.vue";
 
 // ============== 状态初始化 ==============
 // 获取筛选条件存储实例
@@ -94,6 +95,8 @@ const drawCanvasRectangles = ref<
     height: number;
   }[]
 >([]);
+
+const uploadPermitSwitch = ref(false);
 
 // ============== 核心功能方法 ==============
 
@@ -277,7 +280,7 @@ const goMoulds = async (id: any) => {
 const watermark = (text: string, blob: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     // 无水印且不打码时直接返回原图
-    if (text == "" && !watermarkText.mosaic) {
+    if (!watermarkText.watermark && !watermarkText.mosaic) {
       resolve(blob);
       return;
     }
@@ -302,7 +305,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // 添加文字水印
-      if (text != "") {
+      if (watermarkText.watermark) {
         const fontSize = Math.max(canvas.width, canvas.height) / 60;
         ctx.font = `${fontSize}px ZCOOL KuaiLe`;
         ctx.fillStyle = "rgba(0, 0, 0, 0.09)";
@@ -541,6 +544,9 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
   }
 };
 
+//  uploadPermitClose
+const uploadPermitClose = () => {};
+
 // ============== 生命周期钩子 ==============
 onMounted(async () => {
   // 初始化筛选框高度
@@ -646,7 +652,6 @@ onMounted(async () => {
         </a>
       </div>
     </wc-waterfall>
-
     <!-- 图片查看器 -->
     <el-image-viewer
       v-if="imageViewerShow"
@@ -664,6 +669,10 @@ onMounted(async () => {
           :disabled="imgTextDisabled"
           v-model="watermarkText.text"
           style="width: 240px"
+        />
+        <Icon
+          @click="watermarkText.watermark = !watermarkText.watermark"
+          :name="watermarkText.watermark ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
         />
 
         <!-- 打码切换按钮（支持长按编辑） -->
@@ -684,16 +693,17 @@ onMounted(async () => {
         <Icon @click="download(activeIndex)" name="icondownload" />
       </template>
     </el-image-viewer>
-
-    <!-- 打码区域编辑画布 -->
-    <DrawCanvas
-      v-if="drawCanvasShow"
-      @close="drawCanvasClose"
-      :width="drawCanvasWidth"
-      :height="drawCanvasHeight"
-      :rectangles="drawCanvasRectangles"
-    />
   </el-scrollbar>
+
+  <!-- 打码区域编辑画布 -->
+  <DrawCanvas
+    v-if="drawCanvasShow"
+    @close="drawCanvasClose"
+    :width="drawCanvasWidth"
+    :height="drawCanvasHeight"
+    :rectangles="drawCanvasRectangles"
+  />
+  <UploadPermit :switch="uploadPermitSwitch" @close="uploadPermitClose" />
 </template>
 
 <style lang="scss" scoped>

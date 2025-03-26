@@ -21,5 +21,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Trajectory: typeof import('./src/components/Trajectory.vue')['default']
+    Upload: typeof import('./src/components/Upload.vue')['default']
+    UploadPermit: typeof import('./src/components/UploadPermit.vue')['default']
   }
 }

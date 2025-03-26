@@ -255,7 +255,7 @@ const goMoulds = async (id: any) => {
 
     // 为每张图片添加水印
     for (const img of imgs) {
-      let w = await watermark(watermarkText.text, img);
+      let w = await watermark(watermarkText || "", img);
       imgs[imgs.indexOf(img)] = w;
     }
 
@@ -303,7 +303,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // 添加文字水印
-      if (watermarkText.watermark) {
+      if (watermarkText.watermark || text != "") {
         const fontSize = Math.max(canvas.width, canvas.height) / 60;
         ctx.font = `${fontSize}px ZCOOL KuaiLe`;
         ctx.fillStyle = "rgba(0, 0, 0, 0.09)";
@@ -413,7 +413,7 @@ const watermarkTextWatch = debounce(async () => {
       let imgs = mould.imgs.map((item: any) => item.url);
 
       for (const img of imgs) {
-        let w = await watermark(watermarkText.text, img);
+        let w = await watermark(watermarkText.text || "", img);
         imgs[imgs.indexOf(img)] = w;
       }
 

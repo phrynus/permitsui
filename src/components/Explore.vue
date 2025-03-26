@@ -20,7 +20,7 @@ const setExplore = (name: string) => {
   }
 };
 onMounted(() => {
-  console.log(store.explore);
+  // console.log(store.explore);
 });
 </script>
 <template>

@@ -622,7 +622,7 @@ onMounted(async () => {
         <a @click="goMoulds(item.documentId)">
           <!-- 缩略图 -->
           <div class="img">
-            <el-image :src="item.imgs[0]?.formats.medium.url" />
+            <el-image :src="item.imgs[0]?.formats.small.url" />
           </div>
 
           <!-- 卡片底部信息 -->

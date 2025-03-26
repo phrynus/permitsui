@@ -670,24 +670,22 @@ onMounted(async () => {
           v-model="watermarkText.text"
           style="width: 240px"
         />
+
         <Icon
           @click="watermarkText.watermark = !watermarkText.watermark"
           :name="watermarkText.watermark ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
         />
 
-        <!-- 打码切换按钮（支持长按编辑） -->
-        <el-tooltip class="box-item" effect="light" :enterable="false" content="点击打码/长按修改打码" placement="top">
-          <Icon
-            @mousedown="startPress"
-            @mouseup="cancelPress"
-            @mouseleave="cancelPress"
-            @touchstart="startPress"
-            @touchend="cancelPress"
-            @touchcancel="cancelPress"
-            @click="handleClick"
-            :name="watermarkText.mosaic ? 'iconicomosaic' : 'iconicomosaic-ash'"
-          />
-        </el-tooltip>
+        <Icon
+          @mousedown="startPress"
+          @mouseup="cancelPress"
+          @mouseleave="cancelPress"
+          @touchstart="startPress"
+          @touchend="cancelPress"
+          @touchcancel="cancelPress"
+          @click="handleClick"
+          :name="watermarkText.mosaic ? 'iconicomosaic' : 'iconicomosaic-ash'"
+        />
 
         <!-- 下载按钮 -->
         <Icon @click="download(activeIndex)" name="icondownload" />

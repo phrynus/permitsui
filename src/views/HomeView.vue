@@ -78,6 +78,7 @@ const imageViewerShow = ref(false); // 查看器显示状态
 const imageViewerList = ref([]); // 查看器图片列表
 const imageViewerId = ref(); // 当前查看许可证ID
 const imageViewerMould = ref(); // 当前查看许可证数据
+const imageViewerInputV = ref();
 
 // 水印输入框禁用状态（防止频繁操作）
 const imgTextDisabled = ref(false);
@@ -418,6 +419,8 @@ const watermarkTextWatch = debounce(async () => {
       }
 
       imageViewerList.value = imgs; // 更新查看器图片
+      const input: any = document.querySelector(".imageViewerInput"); // 重新聚焦输入框
+      input.focus();
     } finally {
       imgTextDisabled.value = false; // 启用输入框
     }
@@ -546,6 +549,7 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
 onMounted(async () => {
   // 初始化筛选框高度
   screenBox.value.style.height = "30px";
+  imageViewerInputV.value = watermarkText.text || "";
 
   // Token验证（未登录时弹出输入框）
   if (!store.token) {
@@ -662,7 +666,8 @@ onMounted(async () => {
         <el-input
           class="imageViewerInput"
           :disabled="imgTextDisabled"
-          v-model="watermarkText.text"
+          v-model="imageViewerInputV"
+          @change="watermarkText.text = imageViewerInputV"
           style="width: 240px"
         />
 

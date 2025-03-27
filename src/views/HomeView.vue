@@ -42,6 +42,7 @@ const areas = ref([
   "北京",
   "重庆",
   "福建",
+  "甘肃",
   "广东",
   "广西",
   "贵州",
@@ -56,12 +57,14 @@ const areas = ref([
   "江西",
   "辽宁",
   "内蒙古",
+  "青海",
   "山东",
   "山西",
   "陕西",
   "上海",
   "四川",
   "天津",
+  "西藏",
   "云南",
   "浙江"
 ]);
@@ -637,8 +640,8 @@ onMounted(async () => {
             <div class="tags">
               <div class="tag">
                 <!-- 地区标签 -->
-                <a class="tag-link" :class="{ on: item.area.replace(/[\s\S]{4}/, '') == store.areas }">
-                  {{ item.area.replace(/[\s\S]{4}/, "") }}
+                <a class="tag-link" :class="{ on: item.area.replace(/[\s\S]{3}/, '') == store.areas }">
+                  {{ item.area.replace(/[\s\S]{3}/, "") }}
                 </a>
 
                 <!-- 许可证类型标签 -->

@@ -78,7 +78,7 @@ const notHave = ref(false); // 是否还有更多数据
 // 图片查看器相关状态
 const imageViewerIndex = ref(0); // 当前查看图片索引
 const imageViewerShow = ref(false); // 查看器显示状态
-const imageViewerList = ref([]); // 查看器图片列表
+const imageViewerList = ref<any>([]); // 查看器图片列表
 const imageViewerId = ref(); // 当前查看许可证ID
 const imageViewerMould = ref(); // 当前查看许可证数据
 const imageViewerInputV = ref();
@@ -134,7 +134,7 @@ const getQuery = () => {
   return qs.stringify(
     {
       filters,
-      populate: "imgs", // 关联图片数据
+      populate: "img", // 关联图片数据
       sort: "createdAt:desc", // 按创建时间降序
       pagination: {
         page: page.value,
@@ -167,7 +167,7 @@ const apiGo = async (load = true) => {
   try {
     // 发起API请求
     await axios
-      .get(`https://strapi.gommd.com/api/permits?${getQuery()}`, {
+      .get(`https://strapi.phrynus.com/api/permits?${getQuery()}`, {
         headers: {
           Authorization: `Bearer ${store.token}` // 携带认证token
         }
@@ -183,6 +183,9 @@ const apiGo = async (load = true) => {
           notHave.value = true;
           throw "到达底部";
         }
+      })
+      .catch((err: any) => {
+        throw err;
       });
 
     page.value++; // 页码自增
@@ -199,6 +202,12 @@ const apiGo = async (load = true) => {
     });
     isApiGo.value = false;
   } catch (error: any) {
+    isApiGo.value = false;
+    if (error.status == 401) {
+      // 刷新页面
+      store.token = "";
+      location.reload();
+    }
     // 错误处理
     console.error(error);
     ElMessage.error({
@@ -254,18 +263,17 @@ const goMoulds = async (id: any) => {
   try {
     // 获取当前许可证数据
     let mould = moulds.value.filter((item: any) => item.documentId === id)[0];
-    let imgs = mould.imgs.map((item: any) => item.url);
+    let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
+
     imageViewerMould.value = mould;
 
     // 为每张图片添加水印
-    for (const img of imgs) {
-      let w = await watermark(watermarkText.text || "", img);
-      imgs[imgs.indexOf(img)] = w;
+    if (watermarkText.watermark || watermarkText.mosaic) {
+      img = await watermark(watermarkText.text || "", img);
     }
-
     // 显示图片查看器
     imageViewerShow.value = true;
-    imageViewerList.value = imgs;
+    imageViewerList.value = [img];
     imageViewerId.value = id;
     imageViewerIndex.value = 0;
   } finally {
@@ -346,7 +354,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       reject(new Error("图片加载失败"));
     };
 
-    img.src = blob;
+    img.src = "https://strapi.phrynus.com" + blob;
   });
 };
 
@@ -414,14 +422,15 @@ const watermarkTextWatch = debounce(async () => {
     try {
       // 重新生成带水印的图片
       let mould = moulds.value.filter((item: any) => item.documentId === imageViewerId.value)[0];
-      let imgs = mould.imgs.map((item: any) => item.url);
+      let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
+      imageViewerMould.value = mould;
 
-      for (const img of imgs) {
-        let w = await watermark(watermarkText.text || "", img);
-        imgs[imgs.indexOf(img)] = w;
+      // 为每张图片添加水印
+      if (watermarkText.watermark || watermarkText.mosaic) {
+        img = await watermark(watermarkText.text || "", img);
       }
 
-      imageViewerList.value = imgs; // 更新查看器图片
+      imageViewerList.value = [img]; // 更新查看器图片
       const input: any = document.querySelector(".imageViewerInput"); // 重新聚焦输入框
       input.focus();
     } finally {
@@ -527,7 +536,7 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
   if (imageViewerId.value) {
     // 更新后端数据
     axios.put(
-      `https://strapi.gommd.com/api/permits/${imageViewerId.value}`,
+      `https://strapi.phrynus.com/api/permits/${imageViewerId.value}`,
       {
         data: { mosaic: list }
       },
@@ -630,7 +639,7 @@ onMounted(async () => {
         <a @click="goMoulds(item.documentId)">
           <!-- 缩略图 -->
           <div class="img">
-            <el-image :src="item.imgs[0]?.formats.small.url" />
+            <el-image :src="'https://strapi.phrynus.com' + item.img?.formats.small.url" />
           </div>
 
           <!-- 卡片底部信息 -->

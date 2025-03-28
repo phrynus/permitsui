@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { onMounted, ref, defineProps, watch, reactive } from "vue";
-import type { DrawerProps, UploadProps } from "element-plus";
+import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from "element-plus";
 import { userestStore } from "@/stores/rest";
 // Element Plus 组件
 import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
 // HTTP 请求库
 import axios from "axios";
+import type { AxiosProgressEvent } from "axios";
 // 自定义图标组件
 import Icon from "@/components/Icon.vue";
 const store: any = userestStore();
@@ -111,7 +112,32 @@ const handleImageRemove = (file: any, files: any) => {
   }
 };
 const handleImageSuccess = (response: any, file: any, fileList: any) => {
-  fileCurrent.value = response[0];
+  console.log(response);
+
+  fileCurrent.value = response[0] || response;
+};
+
+const uploadImage = (option: UploadRequestOptions) => {
+  const { onSuccess, onError, file, onProgress, data, headers } = option;
+  const fmData = new FormData();
+  fmData.append(option.filename, file, file.name);
+  axios
+    .post("https://strapi.phrynus.com/api/upload", fmData, {
+      headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${store.token}` },
+      onUploadProgress: (event: AxiosProgressEvent) => {
+        if (event.total) {
+          let percent = Math.floor((event.loaded / event.total) * 100);
+          onProgress({ percent } as UploadProgressEvent);
+        }
+      }
+    })
+    .then((res) => {
+      onSuccess(res.data[0]);
+    })
+    .catch((err) => {
+      console.log(err);
+      onError(err);
+    });
 };
 
 // 提交
@@ -151,7 +177,7 @@ const onSubmit = async () => {
     });
     return false;
   }
-  if (fileCurrent.value) {
+  if (!fileCurrent.value) {
     ElMessage({
       message: "等待图片上传",
       type: "error"
@@ -165,30 +191,51 @@ const onSubmit = async () => {
   });
   // 将form.value.time时间格式转为 yyyy-MM-dd
   const dataTime = new Date((time.value || new Date()).valueOf() + 8 * 60 * 60 * 1000).toISOString().split("T")[0];
-  await axios.post(
-    "https://strapi.gommd.com/api/permits",
-    {
-      data: {
-        company: company.value,
-        type: form.value.type,
-        imgs: fileCurrent.value.id,
-        types: form.value.types,
-        area: form.value.area,
-        time: dataTime
+  await axios
+    .post(
+      "https://strapi.phrynus.com/api/permits",
+      {
+        data: {
+          company: company.value,
+          type: form.value.type,
+          img: fileCurrent.value.id,
+          types: form.value.types,
+          area: form.value.area,
+          time: dataTime
+        }
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${store.token}`
+        }
       }
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${store.token}`
-      }
-    }
-  );
-  loading.close();
-  ElMessage({
-    message: "提交成功",
-    type: "success"
-  });
-  store.refresh = !store.refresh;
+    )
+    .catch((err) => {
+      loading.close();
+      ElMessage({
+        message: err.response.data.message,
+        type: "error"
+      });
+    })
+    .then(() => {
+      loading.close();
+      ElMessage({
+        message: "提交成功",
+        type: "success"
+      });
+      store.refresh = !store.refresh;
+      props.onClose();
+      // 清空表单
+      form.value = {
+        type: "",
+        imgs: "",
+        types: [],
+        area: ""
+      };
+      company.value = "";
+      time.value = undefined;
+      fileCurrent.value = undefined;
+    });
 };
 
 onMounted(() => {
@@ -236,7 +283,7 @@ onMounted(() => {
           <div class="image-selector">
             <!-- 图片选择器 -->
             <el-upload
-              action="https://strapi.gommd.com/api/upload"
+              action="https://strapi.phrynus.com/api/upload"
               list-type="picture"
               :on-remove="handleImageRemove"
               :on-success="handleImageSuccess"
@@ -254,9 +301,7 @@ onMounted(() => {
               :limit="1"
               :drag="true"
               name="files"
-              :headers="{
-                Authorization: `Bearer ${store.token}`
-              }"
+              :http-request="uploadImage"
             >
               <div class="icoBox">
                 <Icon name="iconshangchuan" />

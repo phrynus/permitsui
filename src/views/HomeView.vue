@@ -34,7 +34,7 @@ const scrollbar = ref();
 const screenBox: any = ref(false);
 
 // 可选的许可证类型标签
-const tags: any = ref(["ICP", "EDI", "ISP", "VPN", "IDC", "CDN", "SP", "多方通讯", "呼叫中心业务"]);
+const tags: any = ref(["ICP", "EDI", "ISP", "IDC", "CDN", "VPN", "SP", "多方通讯", "呼叫中心业务"]);
 
 // 可选地区列表
 const areas = ref([

@@ -639,7 +639,7 @@ onMounted(async () => {
         <a @click="goMoulds(item.documentId)">
           <!-- 缩略图 -->
           <div class="img">
-            <el-image :src="'https://strapi-cdn.phrynus.com/' + item.img?.formats.small.url" lazy />
+            <el-image :src="'https://strapi-cdn.phrynus.com' + item.img?.formats.small.url" lazy />
           </div>
 
           <!-- 卡片底部信息 -->

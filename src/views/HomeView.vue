@@ -412,8 +412,9 @@ function pixelateRegion(ctx: any, regions: any) {
     tempCtx.drawImage(ctx.canvas, x, y, width, height, 0, 0, width, height);
 
     // 应用多重模糊效果
-    for (let i = 1; i <= 3; i++) {
-      tempCtx.filter = `blur(${i}px)`;
+    for (let i = 3; i >= 1; i--) {
+      console.log((Math.max(canvasWidth, canvasHeight) / 200) * i);
+      tempCtx.filter = `blur(${canvasWidth / 200 / i}px)`;
       tempCtx.drawImage(tempCanvas, 0, 0);
     }
 

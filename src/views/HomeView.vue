@@ -217,7 +217,9 @@ const apiGo = async (load = true) => {
       message: error.toString(),
       duration: 1500 // 持续显示
     });
-    loading.close();
+    if (load && loading) {
+      loading.close();
+    }
   }
 };
 

@@ -646,9 +646,9 @@ onMounted(async () => {
     <wc-waterfall :gap="16" :cols="waterCol">
       <!-- 许可证卡片循环 -->
       <div class="moulds" v-for="item in moulds" :key="item.documentId">
-        <a @click="goMoulds(item.documentId)">
+        <a>
           <!-- 缩略图 -->
-          <div class="img">
+          <div class="img" @click="goMoulds(item.documentId)">
             <el-image :src="imgEditUrl + item.img?.formats.small.url" lazy />
           </div>
 

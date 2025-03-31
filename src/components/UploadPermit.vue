@@ -146,42 +146,48 @@ const onSubmit = async () => {
   if (!company.value) {
     ElMessage({
       message: "请输入公司名称",
-      type: "error"
+      type: "error",
+      plain: true
     });
     return false;
   }
   if (!form.value.type) {
     ElMessage({
       message: "请选择证书类型",
-      type: "error"
+      type: "error",
+      plain: true
     });
     return false;
   }
   if (form.value.types.length < 1) {
     ElMessage({
       message: "请选择业务种类",
-      type: "error"
+      type: "error",
+      plain: true
     });
     return false;
   }
   if (!form.value.area) {
     ElMessage({
       message: "请选择地区",
-      type: "error"
+      type: "error",
+      plain: true
     });
     return false;
   }
   if (!time.value) {
     ElMessage({
       message: "请选择时间",
-      type: "error"
+      type: "error",
+      plain: true
     });
     return false;
   }
   if (!fileCurrent.value) {
     ElMessage({
       message: "等待图片上传",
-      type: "error"
+      type: "error",
+      plain: true
     });
     return false;
   }
@@ -215,14 +221,16 @@ const onSubmit = async () => {
       loading.close();
       ElMessage({
         message: err.response.data.message,
-        type: "error"
+        type: "error",
+        plain: true
       });
     })
     .then(() => {
       loading.close();
       ElMessage({
         message: "提交成功",
-        type: "success"
+        type: "success",
+        plain: true
       });
       store.refresh = !store.refresh;
       props.onClose();
@@ -297,7 +305,8 @@ onMounted(() => {
                 () => {
                   ElMessage({
                     message: '上传失败',
-                    type: 'error'
+                    type: 'error',
+                    plain: true
                   });
                 }
               "

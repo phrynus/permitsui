@@ -26,7 +26,10 @@ const mobileSearch = (text: string) => {
       router.push("/");
     }
   } else {
-    ElMessage.warning("请输入搜索内容");
+    ElMessage.warning({
+      message: "请输入公司名称",
+      plain: true
+    });
   }
 };
 const btnSousuo = () => {

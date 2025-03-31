@@ -213,7 +213,8 @@ const apiGo = async (load = true) => {
     console.error(error);
     ElMessage.error({
       message: error.toString(),
-      duration: 1500 // 持续显示
+      duration: 1500,
+      plain: true
     });
     if (load && loading) {
       loading.close();
@@ -504,8 +505,10 @@ const startPress = () => {
 
     // 长按触发打码编辑模式
     if (imageViewerShow.value) {
-      ElMessage({
-        message: "点击范围外退出"
+      ElMessage.warning({
+        message: "红圈内为打码区，拉框打码，不能撤回；点击红圈范围外退出",
+        duration: 5000,
+        plain: true
       });
 
       // 初始化画布尺寸

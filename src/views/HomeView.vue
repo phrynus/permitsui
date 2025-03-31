@@ -209,6 +209,7 @@ const apiGo = async (load = true) => {
     if (error.status == 401) {
       // 刷新页面
       store.token = "";
+      location.reload();
     }
     // 错误处理
     console.error(error);
@@ -216,7 +217,7 @@ const apiGo = async (load = true) => {
       message: error.toString(),
       duration: 1500 // 持续显示
     });
-    location.reload();
+    loading.close();
   }
 };
 

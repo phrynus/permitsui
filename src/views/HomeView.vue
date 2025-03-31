@@ -354,7 +354,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       reject(new Error("图片加载失败"));
     };
 
-    img.src = "https://strapi-cdn.phrynus.com/" + blob;
+    img.src = "https://strapi-cdn.phrynus.com" + blob;
   });
 };
 

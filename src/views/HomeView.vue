@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // ============== 依赖导入 ==============
 // Vue 核心功能
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, getCurrentInstance } from "vue";
 // 查询字符串处理库
 import qs from "qs";
 // 自定义图标组件
@@ -13,6 +13,7 @@ import { watermarkTextStore } from "@/stores/watermarkText";
 import axios from "axios";
 // Element Plus 组件
 import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
+import type { MessageHandler } from "element-plus";
 // 瀑布流布局组件
 import "wc-waterfall";
 // 自定义画布组件（用于打码区域编辑）
@@ -32,6 +33,7 @@ const waterCol = ref(4);
 const scrollbar = ref();
 // 筛选框DOM引用
 const screenBox: any = ref(false);
+const { proxy } = getCurrentInstance()!;
 
 // 可选的许可证类型标签
 const tags: any = ref(["ICP", "EDI", "ISP", "IDC", "CDN", "VPN", "SP", "多方通讯", "呼叫中心业务"]);
@@ -101,6 +103,7 @@ const drawCanvasRectangles = ref<
 >([]);
 // const imgEditUrl = ref("https://strapi-cdn.phrynus.com"); // 当前编辑图片URL
 const imgEditUrl = ref("https://strapi.phrynus.com"); // 当前编辑图片URL
+const message = ref<MessageHandler>(); // 消息提示实例
 
 // ============== 核心功能方法 ==============
 
@@ -505,9 +508,9 @@ const startPress = () => {
 
     // 长按触发打码编辑模式
     if (imageViewerShow.value) {
-      ElMessage.warning({
+      message.value = ElMessage.warning({
         message: "红圈内为打码区，拉框打码，不能撤回；点击红圈范围外退出",
-        duration: 5000,
+        duration: 20000,
         plain: true
       });
 
@@ -543,7 +546,7 @@ const handleClick = (event: any) => {
  */
 const drawCanvasClose = (list: { x: number; y: number; width: number; height: number }[]) => {
   drawCanvasShow.value = false; // 关闭画布
-
+  message.value?.close(); // 关闭提示
   if (imageViewerId.value) {
     // 更新后端数据
     axios.put(

@@ -183,8 +183,11 @@ const apiGo = async (load = true) => {
         }
         if (res.data.data.length == 0) {
           notHave.value = true;
-
-          throw "到达底部";
+          if (page.value > 1) {
+            throw "到达底部";
+          } else {
+            throw "内容为空";
+          }
         }
       })
       .catch((err: any) => {
@@ -597,7 +600,9 @@ onMounted(async () => {
   // 筛选条件变化时重新加载数据
   watch(store, async () => {
     isApiGo.value = false;
-    screenBox.value.style.height = "30px";
+    if (screenBox.value) {
+      screenBox.value.style.height = "30px";
+    }
     page.value = 1;
     await apiGo();
   });

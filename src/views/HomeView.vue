@@ -99,6 +99,7 @@ const drawCanvasRectangles = ref<
     height: number;
   }[]
 >([]);
+const imgEditUrl = ref("https://strapi-cdn.phrynus.com"); // 当前编辑图片URL
 
 // ============== 核心功能方法 ==============
 
@@ -269,9 +270,9 @@ const goMoulds = async (id: any) => {
 
     // 为每张图片添加水印
     if (watermarkText.watermark || watermarkText.mosaic) {
-      img = await watermark(watermarkText.text || "", img, "https://strapi-cdn.phrynus.com");
+      img = await watermark(watermarkText.text || "", img, imgEditUrl.value);
     } else {
-      img = "https://strapi-cdn.phrynus.com" + img;
+      img = imgEditUrl.value + img;
     }
     // 显示图片查看器
     imageViewerShow.value = true;
@@ -429,9 +430,9 @@ const watermarkTextWatch = debounce(async () => {
 
       // 为每张图片添加水印
       if (watermarkText.watermark || watermarkText.mosaic) {
-        img = await watermark(watermarkText.text || "", img, "https://strapi-cdn.phrynus.com");
+        img = await watermark(watermarkText.text || "", img, imgEditUrl.value);
       } else {
-        img = "https://strapi-cdn.phrynus.com" + img;
+        img = imgEditUrl.value + img;
       }
 
       imageViewerList.value = [img]; // 更新查看器图片
@@ -643,7 +644,7 @@ onMounted(async () => {
         <a @click="goMoulds(item.documentId)">
           <!-- 缩略图 -->
           <div class="img">
-            <el-image :src="'https://strapi-cdn.phrynus.com' + item.img?.formats.small.url" lazy />
+            <el-image :src="imgEditUrl + item.img?.formats.small.url" lazy />
           </div>
 
           <!-- 卡片底部信息 -->

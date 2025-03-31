@@ -94,6 +94,7 @@ const cityRegexList = ref<[string, RegExp][]>([
   ["浙江", /(?:浙江|杭州|宁波|温州|嘉兴|湖州|绍兴|金华|衢州|舟山|台州|丽水)[省市]?/]
 ]);
 const direction = ref<DrawerProps["direction"]>("rtl");
+const drawerSize = ref("30%");
 const fileList = ref<any>([]); // 选择的文件列表
 const fileCurrent = ref<any>({}); // 当前选择的文件
 const company = ref<string>("");
@@ -238,8 +239,12 @@ const onSubmit = async () => {
       fileList.value = [];
     });
 };
-
 onMounted(() => {
+  if (document.body.clientWidth < 992) {
+    direction.value = "btt";
+    drawerSize.value = "90%";
+  }
+
   watch(company, () => {
     let i = 0;
     for (const [city, regex] of cityRegexList.value) {
@@ -253,7 +258,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <el-drawer v-model="props.switch" :direction="direction" :before-close="props.onClose">
+  <el-drawer v-model="props.switch" :size="drawerSize" :direction="direction" :before-close="props.onClose">
     <template #header>
       <h4>上传资料上传</h4>
     </template>

@@ -271,7 +271,7 @@ const goMoulds = async (id: any) => {
   try {
     // 获取当前许可证数据
     let mould = moulds.value.filter((item: any) => item.documentId === id)[0];
-    let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
+    let img = mould.img.size > 2048 || mould.img.width > 2000 ? mould.img.formats.large.url : mould.img.url;
 
     imageViewerMould.value = mould;
 
@@ -412,7 +412,7 @@ function pixelateRegion(ctx: any, regions: any) {
     tempCtx.drawImage(ctx.canvas, x, y, width, height, 0, 0, width, height);
 
     // 应用多重模糊效果
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 5; i++) {
       tempCtx.filter = `blur(${i}px)`;
       tempCtx.drawImage(tempCanvas, 0, 0);
     }
@@ -432,7 +432,7 @@ const watermarkTextWatch = debounce(async () => {
     try {
       // 重新生成带水印的图片
       let mould = moulds.value.filter((item: any) => item.documentId === imageViewerId.value)[0];
-      let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
+      let img = mould.img.size > 2048 || mould.img.width > 2000 ? mould.img.formats.large.url : mould.img.url;
       imageViewerMould.value = mould;
 
       // 为每张图片添加水印

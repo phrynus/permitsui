@@ -270,6 +270,8 @@ const goMoulds = async (id: any) => {
     // 为每张图片添加水印
     if (watermarkText.watermark || watermarkText.mosaic) {
       img = await watermark(watermarkText.text || "", img);
+    } else {
+      img = "https://strapi-cdn.phrynus.com" + img;
     }
     // 显示图片查看器
     imageViewerShow.value = true;
@@ -428,6 +430,8 @@ const watermarkTextWatch = debounce(async () => {
       // 为每张图片添加水印
       if (watermarkText.watermark || watermarkText.mosaic) {
         img = await watermark(watermarkText.text || "", img);
+      } else {
+        img = "https://strapi-cdn.phrynus.com" + img;
       }
 
       imageViewerList.value = [img]; // 更新查看器图片

@@ -198,11 +198,6 @@ const apiGo = async (load = true) => {
       loading.close();
     }
 
-    // 显示成功提示
-    ElMessage.success({
-      message: "加载成功",
-      duration: 800
-    });
     isApiGo.value = false;
   } catch (error: any) {
     isApiGo.value = false;
@@ -690,7 +685,12 @@ onMounted(async () => {
             class="imageViewerInput"
             :disabled="imgTextDisabled"
             v-model="imageViewerInputV"
-            @change="watermarkText.text = imageViewerInputV"
+            @keyup="(event: any) => {
+              if(event.keyCode==13){
+                watermarkText.text = imageViewerInputV
+              }
+            }
+            "
             style="width: 240px"
           />
         </el-tooltip>
@@ -742,19 +742,23 @@ onMounted(async () => {
 .box-item * {
   outline: initial;
 }
+
 .home {
   position: relative;
   padding-top: 10px;
   padding-left: 20px;
   width: 100%;
   background-color: #fff;
+
   .el-scrollbar__bar {
     display: none;
   }
+
   @media screen and (max-width: 959px) {
     padding-top: 0px;
     padding-left: 0px;
   }
+
   .screenBox {
     position: relative;
     padding-right: 92px;
@@ -764,15 +768,19 @@ onMounted(async () => {
 
     @media screen and (max-width: 959px) {
       padding-right: 42px;
+
       .screenBtn {
         padding: 0 6px !important;
+
         span {
           display: none;
         }
+
         svg {
           margin-right: 0 !important;
         }
       }
+
       .tagsBox {
         > div {
           padding: 0 12px !important;
@@ -780,13 +788,16 @@ onMounted(async () => {
         }
       }
     }
+
     .tagsBox {
       margin-bottom: 12px;
       display: flex;
       flex-wrap: wrap;
+
       &:last-child {
         margin-bottom: 0;
       }
+
       > div {
         padding: 0 20px;
         margin-bottom: 6px;
@@ -796,6 +807,7 @@ onMounted(async () => {
         cursor: pointer;
         line-height: 30px;
         font-size: 15px;
+
         &:hover,
         &.on {
           background-color: #00000008;
@@ -803,6 +815,7 @@ onMounted(async () => {
         }
       }
     }
+
     .screenBtn {
       padding: 0 16px;
       width: max-content;
@@ -816,6 +829,7 @@ onMounted(async () => {
       color: #fff;
       position: absolute;
       right: 0;
+
       svg {
         margin-right: 4px;
         font-size: 18px;
@@ -829,22 +843,28 @@ onMounted(async () => {
     @media screen and (max-width: 959px) {
       padding-bottom: 76px;
     }
+
     .moulds {
       overflow: hidden;
       border-radius: 10px;
       border: 1px solid #ebebeb;
       background-color: #fff;
+
       a {
         cursor: pointer;
+
         .img {
           overflow: hidden;
+
           img {
             width: 100%;
             position: relative;
           }
         }
+
         .mold-footer {
           padding: 8px;
+
           .title {
             margin-bottom: 4px;
             margin-top: 4px;
@@ -856,6 +876,7 @@ onMounted(async () => {
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
           }
+
           .info {
             overflow: hidden;
             text-overflow: ellipsis;
@@ -866,11 +887,13 @@ onMounted(async () => {
             font-size: 12px;
             color: #777;
           }
+
           .tags {
             border-top: 1px solid #ebebeb;
             padding-top: 8px;
             display: flex;
             justify-content: space-between;
+
             .tag {
               display: flex;
               flex-wrap: wrap;
@@ -886,11 +909,13 @@ onMounted(async () => {
                 background-color: var(--el-color-success);
                 color: #fff;
                 margin-bottom: 4px;
+
                 &.on {
                   background-color: var(--el-color-danger);
                 }
               }
             }
+
             .price {
               color: var(--el-color-danger);
               font-weight: bold;
@@ -908,6 +933,7 @@ onMounted(async () => {
   background-color: #fff;
   opacity: 1;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+
   .icon {
     fill: #333;
   }

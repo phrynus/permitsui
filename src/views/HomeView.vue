@@ -354,7 +354,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       reject(new Error("图片加载失败"));
     };
 
-    img.src = "https://strapi.phrynus.com" + blob;
+    img.src = "https://strapi-cdn.phrynus.com/" + blob;
   });
 };
 
@@ -639,7 +639,7 @@ onMounted(async () => {
         <a @click="goMoulds(item.documentId)">
           <!-- 缩略图 -->
           <div class="img">
-            <el-image :src="'https://strapi.phrynus.com' + item.img?.formats.small.url" />
+            <el-image :src="'https://strapi-cdn.phrynus.com/' + item.img?.formats.small.url" lazy />
           </div>
 
           <!-- 卡片底部信息 -->

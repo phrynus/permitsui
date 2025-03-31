@@ -99,7 +99,8 @@ const drawCanvasRectangles = ref<
     height: number;
   }[]
 >([]);
-const imgEditUrl = ref("https://strapi-cdn.phrynus.com"); // 当前编辑图片URL
+// const imgEditUrl = ref("https://strapi-cdn.phrynus.com"); // 当前编辑图片URL
+const imgEditUrl = ref("https://strapi.phrynus.com"); // 当前编辑图片URL
 
 // ============== 核心功能方法 ==============
 

@@ -271,7 +271,7 @@ const goMoulds = async (id: any) => {
   try {
     // 获取当前许可证数据
     let mould = moulds.value.filter((item: any) => item.documentId === id)[0];
-    let img = mould.img.size < 1024 ? mould.img.url : mould.img.formats.large.url;
+    let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
 
     imageViewerMould.value = mould;
 
@@ -432,7 +432,7 @@ const watermarkTextWatch = debounce(async () => {
     try {
       // 重新生成带水印的图片
       let mould = moulds.value.filter((item: any) => item.documentId === imageViewerId.value)[0];
-      let img = mould.img.size < 1024 ? mould.img.url : mould.img.formats.large.url;
+      let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
       imageViewerMould.value = mould;
 
       // 为每张图片添加水印

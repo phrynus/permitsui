@@ -235,6 +235,7 @@ const onSubmit = async () => {
       company.value = "";
       time.value = undefined;
       fileCurrent.value = undefined;
+      fileList.value = [];
     });
 };
 

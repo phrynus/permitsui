@@ -269,7 +269,7 @@ const goMoulds = async (id: any) => {
 
     // 为每张图片添加水印
     if (watermarkText.watermark || watermarkText.mosaic) {
-      img = await watermark(watermarkText.text || "", img);
+      img = await watermark(watermarkText.text || "", img, "https://strapi-cdn.phrynus.com");
     } else {
       img = "https://strapi-cdn.phrynus.com" + img;
     }
@@ -289,7 +289,7 @@ const goMoulds = async (id: any) => {
  * @param {string} blob - 图片URL
  * @returns {Promise<string>} 带水印的图片Base64
  */
-const watermark = (text: string, blob: string): Promise<string> => {
+const watermark = (text: string, blob: string, urlH: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     // 无水印且不打码时直接返回原图
     if (!watermarkText.watermark && !watermarkText.mosaic) {
@@ -356,7 +356,7 @@ const watermark = (text: string, blob: string): Promise<string> => {
       reject(new Error("图片加载失败"));
     };
 
-    img.src = "https://strapi-cdn.phrynus.com" + blob;
+    img.src = urlH + blob;
   });
 };
 
@@ -424,12 +424,12 @@ const watermarkTextWatch = debounce(async () => {
     try {
       // 重新生成带水印的图片
       let mould = moulds.value.filter((item: any) => item.documentId === imageViewerId.value)[0];
-      let img = mould.img.size < 2048 ? mould.img.url : mould.img.formats.large.url;
+      let img = mould.img.size < 1024 ? mould.img.url : mould.img.formats.large.url;
       imageViewerMould.value = mould;
 
       // 为每张图片添加水印
       if (watermarkText.watermark || watermarkText.mosaic) {
-        img = await watermark(watermarkText.text || "", img);
+        img = await watermark(watermarkText.text || "", img, "https://strapi-cdn.phrynus.com");
       } else {
         img = "https://strapi-cdn.phrynus.com" + img;
       }

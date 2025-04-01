@@ -326,8 +326,8 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
 
       // 添加文字水印
       if (watermarkText.watermark && text != "") {
-        const fontSize = Math.max(canvas.width, canvas.height) / 60;
-        ctx.font = `${fontSize}px ZCOOL KuaiLe`;
+        const fontSize = (Math.max(canvas.width, canvas.height) / 100) * 1.5;
+        ctx.font = `${fontSize}px Microsoft Yahei`;
         ctx.fillStyle = "rgba(0, 0, 0, 0.13)";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";

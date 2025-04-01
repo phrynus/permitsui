@@ -115,12 +115,6 @@ onMounted(() => {
       color: var(--el-color-success);
       font-family: "ZCOOL KuaiLe-min";
     }
-    .ehhewshes {
-      font-family: "ZCOOL KuaiLe";
-      overflow: hidden;
-      height: 0;
-      width: 0;
-    }
   }
   .search {
     display: flex;

@@ -328,16 +328,15 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
       if (watermarkText.watermark && text != "") {
         const fontSize = Math.max(canvas.width, canvas.height) / 60;
         ctx.font = `${fontSize}px ZCOOL KuaiLe`;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.09)";
+        ctx.fillStyle = "rgba(0, 0, 0, 0.13)";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-
         // 计算水印平铺密度
         const textWidth = ctx.measureText(text).width;
         const textHeight = fontSize;
-        const x = 1 * (1.7 - text.length / 10);
+        const x = 1 * (2 - text.length / 10);
         const spacingX = textWidth * (x < 0.4 ? 0.4 + text.length / 10 : x);
-        const spacingY = textHeight * 3 * 1.5;
+        const spacingY = textHeight * 3 * 2;
 
         // 平铺旋转水印
         for (let x = -1; x < canvas.width; x += spacingX) {
@@ -350,7 +349,6 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
           }
         }
       }
-
       // 添加打码区域
       if (imageViewerMould.value.mosaic && imageViewerMould.value.mosaic.length > 0 && watermarkText.mosaic) {
         pixelateRegion(ctx, imageViewerMould.value.mosaic);

@@ -4,13 +4,13 @@
   font-family: "Nunito";
   src: url("/fonts/Nunito.ttf") format("truetype");
 }
-// @font-face {
-//   font-family: "ZCOOL KuaiLe";
-//   src: url("/fonts/ZCOOLKuaiLe-Regular.ttf") format("truetype");
-// }
+@font-face {
+  font-family: "ZCOOL KuaiLe-min";
+  src: url("/fonts/ZCOOLKuaiLe-Regular-fontzipMin.ttf") format("truetype");
+}
 @font-face {
   font-family: "ZCOOL KuaiLe";
-  src: url("/fonts/ZCOOLKuaiLe-Regular-fontzipMin.ttf") format("truetype");
+  src: url("/fonts/ZCOOLKuaiLe-Regular.ttf") format("truetype");
 }
 
 * {
@@ -30,7 +30,6 @@ body {
   font-family: "Nunito", system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif,
     Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, BlinkMacSystemFont, Helvetica Neue, Arial,
     PingFang SC, PingFang TC, PingFang HK, Microsoft Yahei, Microsoft JhengHei !important;
-
   background-color: #fefefe;
   color: #333;
   font-size: 16px;

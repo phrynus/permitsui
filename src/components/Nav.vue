@@ -71,6 +71,7 @@ onMounted(() => {
         <a href="/">
           {{ name }}
         </a>
+        <div class="ehhewshes">gasgs</div>
       </div>
       <div class="search" :class="searchgo ? 'on' : ''">
         <input type="text" name="key" id="" placeholder="公司名称" :value="store.search" ref="input" />
@@ -94,6 +95,7 @@ onMounted(() => {
   width: 100%;
   margin: auto;
   background-color: #fff;
+
   .container {
     display: flex;
     align-items: center;
@@ -111,7 +113,13 @@ onMounted(() => {
       letter-spacing: 4px;
       padding-right: 10px;
       color: var(--el-color-success);
+      font-family: "ZCOOL KuaiLe-min";
+    }
+    .ehhewshes {
       font-family: "ZCOOL KuaiLe";
+      overflow: hidden;
+      height: 0;
+      width: 0;
     }
   }
   .search {

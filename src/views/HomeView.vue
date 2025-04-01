@@ -696,7 +696,6 @@ onMounted(async () => {
       v-if="imageViewerShow"
       @close="imageViewerShow = false"
       :url-list="imageViewerList"
-      show-progress
       hide-on-click-modal
       @switch="(i: number) => imageViewerIndex = i"
     >

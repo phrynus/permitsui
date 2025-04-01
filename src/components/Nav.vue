@@ -71,6 +71,7 @@ onMounted(() => {
         <a href="/">
           {{ name }}
         </a>
+        
       </div>
       <div class="search" :class="searchgo ? 'on' : ''">
         <input type="text" name="key" id="" placeholder="公司名称" :value="store.search" ref="input" />

@@ -507,10 +507,16 @@ const startPress = () => {
 
     // 长按触发打码编辑模式
     if (imageViewerShow.value) {
-      message.value = ElMessage.warning({
-        message: "红圈内为打码区，拉框打码，不能撤回；点击红圈范围外退出",
+      message.value = ElMessage.success({
+        message: `<p>红圈内为打码区，拉框打码</p>
+        <p>右键删除最近一个打码</p>
+        <p>点击红圈范围外退出</p>`,
         duration: 20000,
-        plain: true
+        plain: true,
+        showClose: true,
+        dangerouslyUseHTMLString: true,
+        center: true,
+        customClass: "imageViewerShowMessage-box"
       });
 
       // 初始化画布尺寸
@@ -621,7 +627,14 @@ onMounted(async () => {
 
 <template>
   <!-- 主滚动容器 -->
-  <el-scrollbar @scroll="scroll" class="home" ref="scrollbar">
+  <el-scrollbar
+    @scroll="scroll"
+    :class="{
+      home: true,
+      w: drawCanvasShow
+    }"
+    ref="scrollbar"
+  >
     <!-- 筛选框 -->
     <div class="screenBox" ref="screenBox">
       <!-- 筛选按钮 -->
@@ -957,6 +970,24 @@ onMounted(async () => {
     @media screen and (max-width: 959px) {
       max-height: 300px;
     }
+  }
+}
+.imageViewerShowMessage-box {
+  z-index: 3001 !important;
+  .el-message__content {
+    p {
+      line-height: 1.5;
+      // text-align: center;
+    }
+  }
+  .el-icon {
+    display: none;
+  }
+}
+.el-scrollbar.home.w {
+  .el-image-viewer__actions,
+  .el-image-viewer__close {
+    display: none;
   }
 }
 </style>

@@ -137,6 +137,14 @@ onMounted(() => {
   ["mousedown", "touchstart"].forEach((evt) => canvas.addEventListener(evt, startDrawing));
   ["mousemove", "touchmove"].forEach((evt) => canvas.addEventListener(evt, moveDrawing));
   ["mouseup", "mouseout", "touchend"].forEach((evt) => canvas.addEventListener(evt, endDrawing));
+  // 监听右键事件
+  canvas.addEventListener("contextmenu", (e: any) => {
+    e.preventDefault();
+    if (state.rectangles?.length > 0) {
+      state.rectangles.pop();
+      redraw();
+    }
+  });
 
   watch(props, () => {
     initCanvas();
@@ -147,7 +155,16 @@ onMounted(() => {
 <template>
   <div class="draw-canvas-box">
     <canvas ref="drawCanvas"></canvas>
-    <div @click="props.onClose(state.rectangles)" class="bg"></div>
+    <div
+      @click="props.onClose(state.rectangles)"
+      @contextmenu="
+        (e:any) => {
+          e.preventDefault();
+          props.onClose(state.rectangles);
+        }
+      "
+      class="bg"
+    ></div>
   </div>
 </template>
 <style lang="scss" scoped>

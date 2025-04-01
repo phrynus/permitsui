@@ -950,4 +950,15 @@ onMounted(async () => {
     fill: #333;
   }
 }
+.el-image {
+  width: 100%;
+  .el-image__inner {
+    width: 100%;
+    object-fit: cover;
+    max-height: 400px;
+    @media screen and (max-width: 959px) {
+      max-height: 300px;
+    }
+  }
+}
 </style>

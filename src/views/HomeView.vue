@@ -36,7 +36,7 @@ const screenBox: any = ref(false);
 const { proxy } = getCurrentInstance()!;
 
 // 可选的许可证类型标签
-const tags: any = ref(["ICP", "EDI", "ISP", "IDC", "CDN", "VPN", "SP", "多方通讯", "呼叫中心业务"]);
+const tags: any = ref(["ICP", "EDI", "ISP", "IDC", "CDN", "VPN", "SP", "多方通讯", "呼叫中心业务", "变更"]);
 
 // 可选地区列表
 const areas = ref([

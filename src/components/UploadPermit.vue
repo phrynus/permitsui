@@ -21,7 +21,7 @@ const props = defineProps({
   }
 });
 const Type = ref<string[]>(["A.许可证", "B.受理通知书", "C.批准通知书"]);
-const Types = ref<string[]>(["ISP", "IDC", "CDN", "VPN", "ICP", "EDI", "SP", "多方通讯", "呼叫中心业务"]);
+const Types = ref<string[]>(["ISP", "IDC", "CDN", "VPN", "ICP", "EDI", "SP", "多方通讯", "呼叫中心业务","变更"]);
 const Area = ref<string[]>([
   "A1.安徽",
   "B1.北京",

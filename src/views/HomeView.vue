@@ -332,7 +332,7 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         // 计算水印平铺密度
-        const textWidth = ctx.measureText(text).width;
+        const textWidth = text.length * fontSize;
         const textHeight = fontSize;
         const x = 1 * (2 - text.length / 10);
         const spacingX = textWidth * (x < 0.4 ? 0.4 + text.length / 10 : x);

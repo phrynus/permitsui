@@ -459,7 +459,7 @@ const download = (index: number) => {
 
   // 生成文件名：地区_公司名_序号
   let filename =
-    imageViewerMould.value.area.replace(/^[\s\S]{4}/, "") + "_" + imageViewerMould.value.company + "_" + index;
+    imageViewerMould.value.area.replace(/^[\s\S]{2}/, "") + "_" + imageViewerMould.value.company + "_" + index;
 
   // 补充文件扩展名
   if (url[0] == "h") {

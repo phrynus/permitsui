@@ -1,109 +1,174 @@
 <script lang="ts" setup>
-import { onMounted, ref, defineProps, watch, reactive } from "vue";
-import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from "element-plus";
-import { userestStore } from "@/stores/rest";
+import { onMounted, ref, defineProps, watch, reactive } from 'vue';
+import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from 'element-plus';
+import { userestStore } from '@/stores/rest';
 // Element Plus 组件
-import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
+import { ElMessage, ElLoading, ElMessageBox } from 'element-plus';
 // HTTP 请求库
-import axios from "axios";
-import type { AxiosProgressEvent } from "axios";
+import axios from 'axios';
+import type { AxiosProgressEvent } from 'axios';
 // 自定义图标组件
-import Icon from "@/components/Icon.vue";
+import Icon from '@/components/Icon.vue';
 const store: any = userestStore();
 const props = defineProps({
   switch: {
     type: Boolean,
-    default: false
+    default: false,
   },
   onClose: {
     type: Function as any,
-    default: (e: any) => {}
-  }
+    default: (e: any) => {},
+  },
 });
-const Type = ref<string[]>(["A.许可证", "B.受理通知书", "C.批准通知书"]);
-const Types = ref<string[]>(["ISP", "IDC", "CDN", "VPN", "ICP", "EDI", "SP", "多方通讯", "呼叫中心业务","变更"]);
+const Type = ref<string[]>(['A.许可证', 'B.受理通知书', 'C.批准通知书']);
+const Types = ref([
+  {
+    name: 'ICP',
+    info: 'ICP-信息服务业务(仅限互联网)',
+  },
+  {
+    name: 'EDI',
+    info: 'EDI-在线数据处理(不含互联网)',
+  },
+  {
+    name: 'ISP',
+    info: 'ISP-互联网接入服务业务',
+  },
+  {
+    name: 'IDC',
+    info: 'IDC-互联网数据中心业务',
+  },
+  {
+    name: 'CDN',
+    info: 'CDN-内容分发网络业务',
+  },
+  {
+    name: 'VPN',
+    info: 'VPN-虚拟专用网络业务',
+  },
+  {
+    name: 'SP',
+    info: 'SP-信息服务业务(不含互联网)',
+  },
+  {
+    name: '多方通讯',
+    info: '多方通讯',
+  },
+  {
+    name: '呼叫中心业务',
+    info: '多方通讯',
+  },
+  {
+    name: '文网文',
+    info: '文网文',
+  },
+  {
+    name: '变更',
+    info: '变更',
+  },
+]);
 const Area = ref<string[]>([
-  "A1.安徽",
-  "B1.北京",
-  "C1.重庆",
-  "F1.福建",
-  "G1.甘肃",
-  "G2.广东",
-  "G3.广西",
-  "G4.贵州",
-  "H1.海南",
-  "H2.河北",
-  "H3.河南",
-  "H4.黑龙江",
-  "H5.湖北",
-  "H6.湖南",
-  "J1.吉林",
-  "J2.江苏",
-  "J3.江西",
-  "L1.辽宁",
-  "N1.内蒙古",
-  "Q1.青海",
-  "S1.山东",
-  "S2.山西",
-  "S3.陕西",
-  "S4.上海",
-  "S5.四川",
-  "T1.天津",
-  "X1.西藏",
-  "Y1.云南",
-  "Z1.浙江"
+  'A1.安徽',
+  'B1.北京',
+  'C1.重庆',
+  'F1.福建',
+  'G1.甘肃',
+  'G2.广东',
+  'G3.广西',
+  'G4.贵州',
+  'H1.海南',
+  'H2.河北',
+  'H3.河南',
+  'H4.黑龙江',
+  'H5.湖北',
+  'H6.湖南',
+  'J1.吉林',
+  'J2.江苏',
+  'J3.江西',
+  'L1.辽宁',
+  'N1.内蒙古',
+  'Q1.青海',
+  'S1.山东',
+  'S2.山西',
+  'S3.陕西',
+  'S4.上海',
+  'S5.四川',
+  'T1.天津',
+  'X1.西藏',
+  'Y1.云南',
+  'Z1.浙江',
 ]);
 const cityRegexList = ref<[string, RegExp][]>([
-  ["安徽", /(?:安徽|合肥|芜湖|蚌埠|淮南|马鞍山|淮北|铜陵|安庆|黄山|滁州|阜阳|宿州|六安|亳州|池州|宣城)[省市]?/],
-  ["北京", /(?:北京)[省市]?/],
-  ["重庆", /(?:重庆)[省市]?/],
-  ["福建", /(?:福建|福州|厦门|莆田|三明| 泉州|漳州|南平|龙岩|宁德)[省市]?/],
-  ["甘肃", /(?:甘肃|兰州|嘉峪关|金昌|白银|天水|武威|张掖|平凉|酒泉|庆阳|定西|陇南)[省市]?/],
-  [
-    "广东",
-    /(?:广东|广州|韶关|深圳|珠海|汕头|佛山|江门|湛江|茂名|肇庆|惠州|梅州|汕尾|河源|阳江|清远|东莞|中山|潮州|揭阳|云浮)[省市]?/
-  ],
-  ["广西", /(?:广西|南宁|柳州|桂林|梧州|北海|防城港|钦州|贵港|玉林|百色|贺州|河池|来宾|崇左)[省市]?/],
-  ["贵州", /(?:贵州|贵阳|六盘水|遵义|安顺|毕节|铜仁)[省市]?/],
-  ["海南", /(?:海南|海口|三亚|三沙|儋州|五指山|琼海|文昌|万宁|东方)[省市]?/],
-  ["河北", /(?:河北|石家庄|唐山|秦皇岛|邯郸|邢台|保定|张家口|承德|沧州|廊坊|衡水)[省市]?/],
-  [
-    "河南",
-    /(?:河南|郑州|开封|洛阳|平顶山|安阳|鹤壁|新乡|焦作|濮阳|许昌|漯河|三门峡|南阳|商丘|信阳|周口|驻马店|济源)[省市]?/
-  ],
-  ["黑龙江", /(?:黑龙江|哈尔滨|齐齐哈尔|鸡西|鹤岗|双鸭山|大庆|伊春|佳木斯|七台河|牡丹江|黑河|绥化)[省市]?/],
-  ["湖北", /(?:湖北|武汉|黄石|十堰|宜昌|襄阳|鄂州|荆门|孝感|荆州|黄冈|咸宁|随州|仙桃|潜江|天门)[省市]?/],
-  ["湖南", /(?:湖南|长沙|株洲|湘潭|衡阳|邵阳|岳阳|常德|张家界|益阳|郴州|永州|怀化|娄底)[省市]?/],
-  ["吉林", /(?:长春|吉林|四平|辽源|通化|白山|松原|白城)[省市]?/],
-  ["江苏", /(?:江苏|南京|无锡|徐州|常州|苏州|南通|连云港|淮安|盐城|扬州|镇江|泰州|宿迁)[省市]?/],
-  ["江西", /(?:江西|南昌|景德镇|萍乡|九江|新余|鹰潭|赣州|吉安|宜春|抚州|上饶)[省市]?/],
-  ["辽宁", /(?:辽宁|沈阳|大连|鞍山|抚顺|本溪|丹东|锦州|营口|阜新|辽阳|盘锦|铁岭|朝阳|葫芦岛)[省市]?/],
-  ["内蒙古", /(?:内蒙古|呼和浩特|包头|乌海|赤峰|通辽|鄂尔多斯|呼伦贝尔|巴彦淖尔|乌兰察布)[省市]?/],
-  ["青海", /(?:青海|西宁|海东)[省市]?/],
-  ["山东", /(?:山东|济南|青岛|淄博|枣庄|东营|烟台|潍坊|济宁|泰安|威海|日照|临沂|德州|聊城|滨州|菏泽)[省市]?/],
-  ["山西", /(?:山西|太原|大同|阳泉|长治|晋城|朔州|晋中|运城|忻州|临汾|吕梁)[省市]?/],
-  ["陕西", /(?:陕西|西安|铜川|宝鸡|咸阳|渭南|延安|汉中|榆林|安康|商洛)[省市]?/],
-  ["上海", /(?:上海)[省市]?/],
-  [
-    "四川",
-    /(?:四川|成都|自贡|攀枝花|泸州|德阳|绵阳|广元|遂宁|内江|乐山|南充|眉山|宜宾|广安|达州|雅安|巴中|资阳)[省市]?/
-  ],
-  ["天津", /(?:天津)[省市]?/],
-  ["西藏", /(?:西藏|拉萨|日喀则|昌都|林芝|山南|那曲)[省市]?/],
-  ["云南", /(?:云南|昆明|曲靖|玉溪|保山|昭通|丽江|普洱|临沧)[省市]?/],
-  ["浙江", /(?:浙江|杭州|宁波|温州|嘉兴|湖州|绍兴|金华|衢州|舟山|台州|丽水)[省市]?/]
+  ['安徽', /(?:安徽|合肥|芜湖|蚌埠|淮南|马鞍山|淮北|铜陵|安庆|黄山|滁州|阜阳|宿州|六安|亳州|池州|宣城)[省市]?/],
+  ['北京', /(?:北京)[省市]?/],
+  ['重庆', /(?:重庆)[省市]?/],
+  ['福建', /(?:福建|福州|厦门|莆田|三明| 泉州|漳州|南平|龙岩|宁德)[省市]?/],
+  ['甘肃', /(?:甘肃|兰州|嘉峪关|金昌|白银|天水|武威|张掖|平凉|酒泉|庆阳|定西|陇南)[省市]?/],
+  ['广东', /(?:广东|广州|韶关|深圳|珠海|汕头|佛山|江门|湛江|茂名|肇庆|惠州|梅州|汕尾|河源|阳江|清远|东莞|中山|潮州|揭阳|云浮)[省市]?/],
+  ['广西', /(?:广西|南宁|柳州|桂林|梧州|北海|防城港|钦州|贵港|玉林|百色|贺州|河池|来宾|崇左)[省市]?/],
+  ['贵州', /(?:贵州|贵阳|六盘水|遵义|安顺|毕节|铜仁)[省市]?/],
+  ['海南', /(?:海南|海口|三亚|三沙|儋州|五指山|琼海|文昌|万宁|东方)[省市]?/],
+  ['河北', /(?:河北|石家庄|唐山|秦皇岛|邯郸|邢台|保定|张家口|承德|沧州|廊坊|衡水)[省市]?/],
+  ['河南', /(?:河南|郑州|开封|洛阳|平顶山|安阳|鹤壁|新乡|焦作|濮阳|许昌|漯河|三门峡|南阳|商丘|信阳|周口|驻马店|济源)[省市]?/],
+  ['黑龙江', /(?:黑龙江|哈尔滨|齐齐哈尔|鸡西|鹤岗|双鸭山|大庆|伊春|佳木斯|七台河|牡丹江|黑河|绥化)[省市]?/],
+  ['湖北', /(?:湖北|武汉|黄石|十堰|宜昌|襄阳|鄂州|荆门|孝感|荆州|黄冈|咸宁|随州|仙桃|潜江|天门)[省市]?/],
+  ['湖南', /(?:湖南|长沙|株洲|湘潭|衡阳|邵阳|岳阳|常德|张家界|益阳|郴州|永州|怀化|娄底)[省市]?/],
+  ['吉林', /(?:长春|吉林|四平|辽源|通化|白山|松原|白城)[省市]?/],
+  ['江苏', /(?:江苏|南京|无锡|徐州|常州|苏州|南通|连云港|淮安|盐城|扬州|镇江|泰州|宿迁)[省市]?/],
+  ['江西', /(?:江西|南昌|景德镇|萍乡|九江|新余|鹰潭|赣州|吉安|宜春|抚州|上饶)[省市]?/],
+  ['辽宁', /(?:辽宁|沈阳|大连|鞍山|抚顺|本溪|丹东|锦州|营口|阜新|辽阳|盘锦|铁岭|朝阳|葫芦岛)[省市]?/],
+  ['内蒙古', /(?:内蒙古|呼和浩特|包头|乌海|赤峰|通辽|鄂尔多斯|呼伦贝尔|巴彦淖尔|乌兰察布)[省市]?/],
+  ['青海', /(?:青海|西宁|海东)[省市]?/],
+  ['山东', /(?:山东|济南|青岛|淄博|枣庄|东营|烟台|潍坊|济宁|泰安|威海|日照|临沂|德州|聊城|滨州|菏泽)[省市]?/],
+  ['山西', /(?:山西|太原|大同|阳泉|长治|晋城|朔州|晋中|运城|忻州|临汾|吕梁)[省市]?/],
+  ['陕西', /(?:陕西|西安|铜川|宝鸡|咸阳|渭南|延安|汉中|榆林|安康|商洛)[省市]?/],
+  ['上海', /(?:上海)[省市]?/],
+  ['四川', /(?:四川|成都|自贡|攀枝花|泸州|德阳|绵阳|广元|遂宁|内江|乐山|南充|眉山|宜宾|广安|达州|雅安|巴中|资阳)[省市]?/],
+  ['天津', /(?:天津)[省市]?/],
+  ['西藏', /(?:西藏|拉萨|日喀则|昌都|林芝|山南|那曲)[省市]?/],
+  ['云南', /(?:云南|昆明|曲靖|玉溪|保山|昭通|丽江|普洱|临沧)[省市]?/],
+  ['浙江', /(?:浙江|杭州|宁波|温州|嘉兴|湖州|绍兴|金华|衢州|舟山|台州|丽水)[省市]?/],
 ]);
-const direction = ref<DrawerProps["direction"]>("rtl");
-const drawerSize = ref("30%");
+
+const cueWord = `
+##要求
+提取公司名称、发证时间、许可证编号
+判断业务是否包含：ICP、EDI、IDC、CDN、ISP
+判断类型是否是：许可证、受理通知书、批准通知书
+##输出格式JSON；限制只输出json；
+{
+"corporate": "{{公司名称}}",
+"ref": "{{编号}}",
+"type": "{{类型}}",
+"issuance": "{{发证时间}}",
+"business": [{{业务代号}}]
+}
+##备注
+####许可证编号格式为
+{{地区短标识}} 许可{{编号}}号
+####类型对应输出数字
+许可证：1
+受理通知书：2
+批准通知书：3
+####业务代号
+信息服务业务(仅限互联网信息服务)：ICP
+在线数据处理与交易处理业务：EDI
+互联网数据中心业务:IDC
+内容分发网络业务：CDN
+互联网接入服务业务：ISP
+`;
+const direction = ref<DrawerProps['direction']>('rtl');
+const drawerSize = ref('30%');
 const fileList = ref<any>([]); // 选择的文件列表
 const fileCurrent = ref<any>({}); // 当前选择的文件
-const company = ref<string>("");
+const company = ref<string>('');
 const time = ref<Date>();
 const form = ref({
-  type: "",
-  imgs: "",
+  type: '',
+  imgs: '',
   types: [],
-  area: ""
+  area: '',
+  ref: '',
 });
 
 // 图片选择变化时触发
@@ -123,14 +188,14 @@ const uploadImage = (option: UploadRequestOptions) => {
   const fmData = new FormData();
   fmData.append(option.filename, file, file.name);
   axios
-    .post("https://strapi.phrynus.com/api/upload", fmData, {
-      headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${store.token}` },
+    .post('https://strapi.phrynus.com/api/upload', fmData, {
+      headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${store.token}` },
       onUploadProgress: (event: AxiosProgressEvent) => {
         if (event.total) {
           let percent = Math.floor((event.loaded / event.total) * 100);
           onProgress({ percent } as UploadProgressEvent);
         }
-      }
+      },
     })
     .then((res) => {
       onSuccess(res.data[0]);
@@ -145,62 +210,62 @@ const uploadImage = (option: UploadRequestOptions) => {
 const onSubmit = async () => {
   if (!company.value) {
     ElMessage({
-      message: "请输入公司名称",
-      type: "error",
-      plain: true
+      message: '请输入公司名称',
+      type: 'error',
+      plain: true,
     });
     return false;
   }
   if (!form.value.type) {
     ElMessage({
-      message: "请选择证书类型",
-      type: "error",
-      plain: true
+      message: '请选择证书类型',
+      type: 'error',
+      plain: true,
     });
     return false;
   }
   if (form.value.types.length < 1) {
     ElMessage({
-      message: "请选择业务种类",
-      type: "error",
-      plain: true
+      message: '请选择业务种类',
+      type: 'error',
+      plain: true,
     });
     return false;
   }
   if (!form.value.area) {
     ElMessage({
-      message: "请选择地区",
-      type: "error",
-      plain: true
+      message: '请选择地区',
+      type: 'error',
+      plain: true,
     });
     return false;
   }
   if (!time.value) {
     ElMessage({
-      message: "请选择时间",
-      type: "error",
-      plain: true
+      message: '请选择时间',
+      type: 'error',
+      plain: true,
     });
     return false;
   }
   if (!fileCurrent.value) {
     ElMessage({
-      message: "等待图片上传",
-      type: "error",
-      plain: true
+      message: '等待图片上传',
+      type: 'error',
+      plain: true,
     });
     return false;
   }
   const loading = ElLoading.service({
     lock: true,
-    text: "Loading",
-    background: "rgba(255, 255, 255, 0.5)"
+    text: 'Loading',
+    background: 'rgba(255, 255, 255, 0.5)',
   });
   // 将form.value.time时间格式转为 yyyy-MM-dd
-  const dataTime = new Date((time.value || new Date()).valueOf() + 8 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const dataTime = new Date((time.value || new Date()).valueOf() + 8 * 60 * 60 * 1000).toISOString().split('T')[0];
   await axios
     .post(
-      "https://strapi.phrynus.com/api/permits",
+      'https://strapi.phrynus.com/api/permits',
       {
         data: {
           company: company.value,
@@ -208,40 +273,42 @@ const onSubmit = async () => {
           img: fileCurrent.value.id,
           types: form.value.types,
           area: form.value.area,
-          time: dataTime
-        }
+          time: dataTime,
+          ref: form.value.ref,
+        },
       },
       {
         headers: {
-          Authorization: `Bearer ${store.token}`
-        }
+          Authorization: `Bearer ${store.token}`,
+        },
       }
     )
     .catch((err) => {
       loading.close();
       ElMessage({
         message: err.response.data.message,
-        type: "error",
-        plain: true
+        type: 'error',
+        plain: true,
       });
     })
     .then(() => {
       loading.close();
       ElMessage({
-        message: "提交成功",
-        type: "success",
-        plain: true
+        message: '提交成功',
+        type: 'success',
+        plain: true,
       });
       store.refresh = !store.refresh;
       props.onClose();
       // 清空表单
       form.value = {
-        type: "",
-        imgs: "",
+        type: '',
+        imgs: '',
         types: [],
-        area: ""
+        area: '',
+        ref: '',
       };
-      company.value = "";
+      company.value = '';
       time.value = undefined;
       fileCurrent.value = undefined;
       fileList.value = [];
@@ -249,8 +316,8 @@ const onSubmit = async () => {
 };
 onMounted(() => {
   if (document.body.clientWidth < 992) {
-    direction.value = "btt";
-    drawerSize.value = "90%";
+    direction.value = 'btt';
+    drawerSize.value = '90%';
   }
 
   watch(company, () => {
@@ -275,23 +342,26 @@ onMounted(() => {
         <el-form-item label="公司名称:">
           <el-input v-model="company" placeholder="XXXX有限公司" />
         </el-form-item>
+        <el-form-item label="许可证编号:">
+          <el-input v-model="form.ref" placeholder="许可证编号" />
+        </el-form-item>
         <el-form-item label="证书类型:">
-          <el-select v-model="form.type" placeholder="许可证、受理通知书、批准通知书">
+          <el-select placement="left" v-model="form.type" placeholder="许可证、受理通知书、批准通知书">
             <el-option v-for="time in Type" :key="time" :label="time.replace(/[\s\S]{2}/, '')" :value="time" />
           </el-select>
         </el-form-item>
         <el-form-item label="业务种类:">
-          <el-select v-model="form.types" :multiple="true" placeholder="ICP、EDI">
-            <el-option v-for="time in Types" :key="time" :label="time" :value="time" />
+          <el-select placement="left" v-model="form.types" :multiple="true" placeholder="ICP、EDI">
+            <el-option v-for="time in Types" :key="time.name" :label="time.info" :value="time.name" />
           </el-select>
         </el-form-item>
         <el-form-item label="地区:">
-          <el-select v-model="form.area" placeholder="安徽、北京">
+          <el-select placement="left" v-model="form.area" placeholder="安徽、北京">
             <el-option v-for="time in Area" :key="time" :label="time.replace(/[\s\S]{3}/, '')" :value="time" />
           </el-select>
         </el-form-item>
         <el-form-item label="时间:">
-          <el-date-picker v-model="time" format="YYYY-MM-DD" type="date" placeholder="发证日期" style="width: 100%" />
+          <el-date-picker placement="left" v-model="time" format="YYYY-MM-DD" type="date" placeholder="发证日期" style="width: 100%" />
         </el-form-item>
         <el-form-item label="图片:">
           <div class="image-selector">
@@ -306,7 +376,7 @@ onMounted(() => {
                   ElMessage({
                     message: '上传失败',
                     type: 'error',
-                    plain: true
+                    plain: true,
                   });
                 }
               "

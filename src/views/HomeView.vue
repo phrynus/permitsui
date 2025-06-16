@@ -1,24 +1,24 @@
 <script setup lang="ts">
 // ============== 依赖导入 ==============
 // Vue 核心功能
-import { ref, onMounted, watch, getCurrentInstance } from "vue";
+import { ref, onMounted, watch, getCurrentInstance } from 'vue';
 // 查询字符串处理库
-import qs from "qs";
+import qs from 'qs';
 // 自定义图标组件
-import Icon from "@/components/Icon.vue";
+import Icon from '@/components/Icon.vue';
 // Pinia 状态管理
-import { userestStore } from "@/stores/rest";
-import { watermarkTextStore } from "@/stores/watermarkText";
+import { userestStore } from '@/stores/rest';
+import { watermarkTextStore } from '@/stores/watermarkText';
 // HTTP 请求库
-import axios from "axios";
+import axios from 'axios';
 // Element Plus 组件
-import { ElMessage, ElLoading, ElMessageBox } from "element-plus";
-import type { MessageHandler } from "element-plus";
+import { ElMessage, ElLoading, ElMessageBox } from 'element-plus';
+import type { MessageHandler } from 'element-plus';
 // 瀑布流布局组件
-import "wc-waterfall";
+import 'wc-waterfall';
 // 自定义画布组件（用于打码区域编辑）
-import DrawCanvas from "@/components/DrawCanvas.vue";
-import UploadPermit from "@/components/UploadPermit.vue";
+import DrawCanvas from '@/components/DrawCanvas.vue';
+import UploadPermit from '@/components/UploadPermit.vue';
 
 // ============== 状态初始化 ==============
 // 获取筛选条件存储实例
@@ -36,46 +36,46 @@ const screenBox: any = ref(false);
 const { proxy } = getCurrentInstance()!;
 
 // 可选的许可证类型标签
-const tags: any = ref(["ICP", "EDI", "ISP", "IDC", "CDN", "VPN", "SP", "多方通讯", "呼叫中心业务", "变更"]);
+const tags: any = ref(['ICP', 'EDI', 'ISP', 'IDC', 'CDN', 'VPN', 'SP', '多方通讯', '呼叫中心业务', '文网文', '变更']);
 
 // 可选地区列表
 const areas = ref([
-  "安徽",
-  "北京",
-  "重庆",
-  "福建",
-  "甘肃",
-  "广东",
-  "广西",
-  "贵州",
-  "海南",
-  "河北",
-  "河南",
-  "黑龙江",
-  "湖北",
-  "湖南",
-  "吉林",
-  "江苏",
-  "江西",
-  "辽宁",
-  "内蒙古",
-  "青海",
-  "山东",
-  "山西",
-  "陕西",
-  "上海",
-  "四川",
-  "天津",
-  "西藏",
-  "云南",
-  "浙江"
+  '安徽',
+  '北京',
+  '重庆',
+  '福建',
+  '甘肃',
+  '广东',
+  '广西',
+  '贵州',
+  '海南',
+  '河北',
+  '河南',
+  '黑龙江',
+  '湖北',
+  '湖南',
+  '吉林',
+  '江苏',
+  '江西',
+  '辽宁',
+  '内蒙古',
+  '青海',
+  '山东',
+  '山西',
+  '陕西',
+  '上海',
+  '四川',
+  '天津',
+  '西藏',
+  '云南',
+  '浙江',
 ]);
 
 // 分页相关
 const page = ref(1); // 当前页码
 const pageSize = ref(24); // 每页数量
 const isApiGo = ref(false); // 防止重复请求标志
-const notHave = ref(false); // 是否还有更多数据
+const notHave = ref(false); // 是否没有数据了
 
 // 图片查看器相关状态
 const imageViewerIndex = ref(0); // 当前查看图片索引
@@ -102,7 +102,7 @@ const drawCanvasRectangles = ref<
   }[]
 >([]);
 // const imgEditUrl = ref("https://strapi-cdn.phrynus.com"); // 当前编辑图片URL
-const imgEditUrl = ref("https://strapi.phrynus.com"); // 当前编辑图片URL
+const imgEditUrl = ref('https://strapi.phrynus.com'); // 当前编辑图片URL
 const message = ref<MessageHandler>(); // 消息提示实例
 
 // ============== 核心功能方法 ==============
@@ -113,10 +113,10 @@ const message = ref<MessageHandler>(); // 消息提示实例
 const screen = () => {
   if (screenBox.value.clientHeight > 50) {
     // 收起筛选框
-    screenBox.value.style.height = "30px";
+    screenBox.value.style.height = '30px';
   } else {
     // 展开筛选框（自适应高度）
-    screenBox.value.style.height = screenBox.value.scrollHeight + "px";
+    screenBox.value.style.height = screenBox.value.scrollHeight + 'px';
   }
 };
 
@@ -131,20 +131,28 @@ const getQuery = () => {
       { types: { $contains: store.tags } }, // 类型筛选
       { area: { $contains: store.areas } }, // 地区筛选
       { type: { $contains: store.explore } }, // 探索类型筛选
-      { company: { $contains: store.search } } // 公司名称搜索
-    ]
+      { company: { $contains: store.search } }, // 公司名称搜索
+    ],
   };
+  // 当探索类型为'sp'时，排除ISP类型
+  if (store.tags == 'SP') {
+    filters.$and.push({
+      types: {
+        $not: { $contains: 'ISP' }, // 添加排除ISP的条件
+      },
+    });
+  }
 
   // 序列化为查询字符串
   return qs.stringify(
     {
       filters,
-      populate: "img", // 关联图片数据
-      sort: "createdAt:desc", // 按创建时间降序
+      populate: 'img', // 关联图片数据
+      sort: 'createdAt:desc', // 按创建时间降序
       pagination: {
         page: page.value,
-        pageSize: pageSize.value
-      }
+        pageSize: pageSize.value,
+      },
     },
     { encodeValuesOnly: true } // 保持URL整洁
   );
@@ -164,8 +172,8 @@ const apiGo = async (load = true) => {
   if (load) {
     loading = ElLoading.service({
       lock: true,
-      text: "Loading",
-      background: "rgba(255, 255, 255, 0.5)"
+      text: 'Loading',
+      background: 'rgba(255, 255, 255, 0.5)',
     });
   }
 
@@ -174,8 +182,8 @@ const apiGo = async (load = true) => {
     await axios
       .get(`https://strapi.phrynus.com/api/permits?${getQuery()}`, {
         headers: {
-          Authorization: `Bearer ${store.token}` // 携带认证token
-        }
+          Authorization: `Bearer ${store.token}`, // 携带认证token
+        },
       })
       .then((res: any) => {
         // 更新数据列表（分页加载或重置）
@@ -184,12 +192,13 @@ const apiGo = async (load = true) => {
         } else {
           moulds.value = [...moulds.value, ...res.data.data];
         }
+        notHave.value = false; // 重置无数据标志
         if (res.data.data.length == 0) {
           notHave.value = true;
           if (page.value > 1) {
-            throw "到达底部";
+            throw '到达底部';
           } else {
-            throw "内容为空";
+            throw '内容为空';
           }
         }
       })
@@ -209,7 +218,7 @@ const apiGo = async (load = true) => {
     isApiGo.value = false;
     if (error.status == 401) {
       // 刷新页面
-      store.token = "";
+      store.token = '';
       location.reload();
     }
     // 错误处理
@@ -217,7 +226,7 @@ const apiGo = async (load = true) => {
     ElMessage.error({
       message: error.toString(),
       duration: 1500,
-      plain: true
+      plain: true,
     });
     if (load && loading) {
       loading.close();
@@ -236,7 +245,7 @@ const scroll = async (e: any) => {
     if (isApiGo.value || moulds.value.length < pageSize.value || notHave.value) return;
 
     isApiGo.value = false;
-    screenBox.value.style.height = "30px"; // 收起筛选框
+    screenBox.value.style.height = '30px'; // 收起筛选框
     apiGo(false); // 加载更多数据
   }
 };
@@ -264,20 +273,20 @@ const goMoulds = async (id: any) => {
   // 显示加载动画
   let loading = ElLoading.service({
     lock: true,
-    text: "Loading",
-    background: "rgba(255, 255, 255, 0.5)"
+    text: 'Loading',
+    background: 'rgba(255, 255, 255, 0.5)',
   });
 
   try {
     // 获取当前许可证数据
     let mould = moulds.value.filter((item: any) => item.documentId === id)[0];
-    let img = mould.img.size > 2048 || mould.img.width > 2000 ? mould.img.formats.large.url : mould.img.url;
+    let img = mould.img.size > 4096 || mould.img.width > 4096 ? mould.img.formats.large.url : mould.img.url;
 
     imageViewerMould.value = mould;
 
     // 为每张图片添加水印
     if (watermarkText.watermark || watermarkText.mosaic) {
-      img = await watermark(watermarkText.text || "", img, imgEditUrl.value);
+      img = await watermark(watermarkText.text || '', img, imgEditUrl.value);
     } else {
       img = imgEditUrl.value + img;
     }
@@ -306,11 +315,11 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
     }
 
     const img = new Image();
-    img.crossOrigin = "Anonymous"; // 解决跨域问题
+    img.crossOrigin = 'Anonymous'; // 解决跨域问题
 
     img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
       if (!ctx) {
         resolve(blob);
@@ -325,12 +334,12 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       // 添加文字水印
-      if (watermarkText.watermark && text != "") {
+      if (watermarkText.watermark && text != '') {
         const fontSize = (Math.max(canvas.width, canvas.height) / 100) * 1.5;
         ctx.font = `${fontSize}px Microsoft Yahei`;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.13)";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.13)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
         // 计算水印平铺密度
         const textWidth = text.length * fontSize;
         const textHeight = fontSize;
@@ -355,11 +364,11 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
       }
 
       // 导出为JPEG格式
-      resolve(canvas.toDataURL("image/jpeg"));
+      resolve(canvas.toDataURL('image/jpeg'));
     };
 
     img.onerror = () => {
-      reject(new Error("图片加载失败"));
+      reject(new Error('图片加载失败'));
     };
 
     img.src = urlH + blob;
@@ -401,10 +410,10 @@ function pixelateRegion(ctx: any, regions: any) {
     const height = Math.floor(region.height * canvasHeight);
 
     // 创建临时画布处理模糊效果
-    const tempCanvas = document.createElement("canvas");
+    const tempCanvas = document.createElement('canvas');
     tempCanvas.width = width;
     tempCanvas.height = height;
-    const tempCtx = tempCanvas.getContext("2d") as CanvasRenderingContext2D;
+    const tempCtx = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
 
     // 拷贝区域到临时画布
     tempCtx.drawImage(ctx.canvas, x, y, width, height, 0, 0, width, height);
@@ -431,18 +440,18 @@ const watermarkTextWatch = debounce(async () => {
     try {
       // 重新生成带水印的图片
       let mould = moulds.value.filter((item: any) => item.documentId === imageViewerId.value)[0];
-      let img = mould.img.size > 2048 || mould.img.width > 2000 ? mould.img.formats.large.url : mould.img.url;
+      let img = mould.img.size > 4096 || mould.img.width > 4096 ? mould.img.formats.large.url : mould.img.url;
       imageViewerMould.value = mould;
 
       // 为每张图片添加水印
       if (watermarkText.watermark || watermarkText.mosaic) {
-        img = await watermark(watermarkText.text || "", img, imgEditUrl.value);
+        img = await watermark(watermarkText.text || '', img, imgEditUrl.value);
       } else {
         img = imgEditUrl.value + img;
       }
 
       imageViewerList.value = [img]; // 更新查看器图片
-      const input: any = document.querySelector(".imageViewerInput"); // 重新聚焦输入框
+      const input: any = document.querySelector('.imageViewerInput'); // 重新聚焦输入框
       input.focus();
     } finally {
       imgTextDisabled.value = false; // 启用输入框
@@ -458,14 +467,13 @@ const download = (index: number) => {
   const url = imageViewerList.value[index] as string;
 
   // 生成文件名：地区_公司名_序号
-  let filename =
-    imageViewerMould.value.area.replace(/^[\s\S]{2}/, "") + "_" + imageViewerMould.value.company + "_" + index;
+  let filename = imageViewerMould.value.area.replace(/^[\s\S]{2}/, '') + '_' + imageViewerMould.value.company + '_' + index;
 
   // 补充文件扩展名
-  if (url[0] == "h") {
-    filename += url.slice(url.lastIndexOf("."));
+  if (url[0] == 'h') {
+    filename += url.slice(url.lastIndexOf('.'));
   } else {
-    filename += ".jpeg";
+    filename += '.jpeg';
   }
 
   // 创建下载链接
@@ -473,7 +481,7 @@ const download = (index: number) => {
     .then((response) => response.blob())
     .then((blob) => {
       const blobUrl = URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = blobUrl;
       link.download = filename;
       document.body.appendChild(link);
@@ -516,11 +524,11 @@ const startPress = () => {
         showClose: true,
         dangerouslyUseHTMLString: true,
         center: true,
-        customClass: "imageViewerShowMessage-box"
+        customClass: 'imageViewerShowMessage-box',
       });
 
       // 初始化画布尺寸
-      let img = document.querySelectorAll(".home .el-image-viewer__canvas img")[imageViewerIndex.value];
+      let img = document.querySelectorAll('.home .el-image-viewer__canvas img')[imageViewerIndex.value];
       drawCanvasWidth.value = img.clientWidth;
       drawCanvasHeight.value = img.clientHeight;
 
@@ -557,12 +565,12 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
     axios.put(
       `https://strapi.phrynus.com/api/permits/${imageViewerId.value}`,
       {
-        data: { mosaic: list }
+        data: { mosaic: list },
       },
       {
         headers: {
-          Authorization: `Bearer ${store.token}`
-        }
+          Authorization: `Bearer ${store.token}`,
+        },
       }
     );
 
@@ -579,20 +587,20 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
 // ============== 生命周期钩子 ==============
 onMounted(async () => {
   // 初始化筛选框高度
-  screenBox.value.style.height = "30px";
-  imageViewerInputV.value = watermarkText.text || "";
+  screenBox.value.style.height = '30px';
+  imageViewerInputV.value = watermarkText.text || '';
 
   // Token验证（未登录时弹出输入框）
   if (!store.token) {
-    await ElMessageBox.prompt("", "填写 Token", {
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
+    await ElMessageBox.prompt('', '填写 Token', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
       showCancelButton: false,
       closeOnPressEscape: false,
       closeOnClickModal: false,
       showClose: false,
       inputPattern: /^[a-z0-9]{256}$/,
-      inputErrorMessage: "请输入内容"
+      inputErrorMessage: '请输入内容',
     }).then(async ({ value }) => {
       store.token = value; // 保存Token
     });
@@ -602,7 +610,7 @@ onMounted(async () => {
   resize();
 
   // 监听窗口大小变化
-  window.addEventListener("resize", resize);
+  window.addEventListener('resize', resize);
 
   // 初始数据加载
   await apiGo();
@@ -612,7 +620,7 @@ onMounted(async () => {
   watch(store, async () => {
     isApiGo.value = false;
     if (screenBox.value) {
-      screenBox.value.style.height = "30px";
+      screenBox.value.style.height = '30px';
     }
     page.value = 1;
     await apiGo();
@@ -631,7 +639,7 @@ onMounted(async () => {
     @scroll="scroll"
     :class="{
       home: true,
-      w: drawCanvasShow
+      w: drawCanvasShow,
     }"
     ref="scrollbar"
   >
@@ -678,7 +686,7 @@ onMounted(async () => {
               <div class="tag">
                 <!-- 地区标签 -->
                 <a class="tag-link" :class="{ on: item.area.replace(/[\s\S]{3}/, '') == store.areas }">
-                  {{ item.area.replace(/[\s\S]{3}/, "") }}
+                  {{ item.area.replace(/[\s\S]{3}/, '') }}
                 </a>
 
                 <!-- 许可证类型标签 -->
@@ -692,13 +700,7 @@ onMounted(async () => {
       </div>
     </wc-waterfall>
     <!-- 图片查看器 -->
-    <el-image-viewer
-      v-if="imageViewerShow"
-      @close="imageViewerShow = false"
-      :url-list="imageViewerList"
-      hide-on-click-modal
-      @switch="(i: number) => imageViewerIndex = i"
-    >
+    <el-image-viewer v-if="imageViewerShow" @close="imageViewerShow = false" :url-list="imageViewerList" hide-on-click-modal @switch="(i: number) => imageViewerIndex = i">
       <!-- 自定义工具栏 -->
       <template #toolbar="{ activeIndex }">
         <!-- 水印文字输入 -->
@@ -751,13 +753,7 @@ onMounted(async () => {
   </el-scrollbar>
 
   <!-- 打码区域编辑画布 -->
-  <DrawCanvas
-    v-if="drawCanvasShow"
-    @close="drawCanvasClose"
-    :width="drawCanvasWidth"
-    :height="drawCanvasHeight"
-    :rectangles="drawCanvasRectangles"
-  />
+  <DrawCanvas v-if="drawCanvasShow" @close="drawCanvasClose" :width="drawCanvasWidth" :height="drawCanvasHeight" :rectangles="drawCanvasRectangles" />
 </template>
 
 <style lang="scss" scoped>

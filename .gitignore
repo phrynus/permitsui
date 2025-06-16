@@ -131,3 +131,5 @@ dist
 
 
 .vscode
+
+vite.config.ts.*.mjs

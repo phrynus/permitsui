@@ -228,13 +228,13 @@ const uploadImage = (option: UploadRequestOptions) => {
 
 // 调用硅基流动API进行图片识别
 const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
-  try {
-    const loading = ElLoading.service({
-      lock: true,
-      text: '正在识别图片...',
-      background: 'rgba(255, 255, 255, 0.5)',
-    });
+  const loading = ElLoading.service({
+    lock: true,
+    text: '正在识别图片...',
+    background: 'rgba(255, 255, 255, 0.5)',
+  });
 
+  try {
     const response = await axios.post(
       'https://api.siliconflow.cn/v1/chat/completions',
       {
@@ -260,7 +260,7 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
             ],
           },
         ],
-        temperature: 0,
+        temperature: 0.5,
       },
       {
         headers: {
@@ -297,6 +297,7 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
     return null;
   } catch (error) {
     console.error('调用硅基流动API失败:', error);
+    loading.close();
     throw error;
   }
 };

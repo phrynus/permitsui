@@ -249,7 +249,7 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
             content: [
               {
                 type: 'text',
-                text: '请分析这张图片中的许可证信息',
+                text: `请分析这张图片中的许可证信息，日期不可能超过${new Date().getFullYear()}年${new Date().getMonth() + 1}月${new Date().getDate()}号`,
               },
               {
                 type: 'image_url',

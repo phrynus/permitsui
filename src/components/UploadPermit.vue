@@ -51,12 +51,12 @@ const Types = ref([
     info: 'SP-信息服务业务(不含互联网)',
   },
   {
-    name: '多方通讯',
-    info: '多方通讯',
+    name: '多方通信',
+    info: '多方通信',
   },
   {
     name: '呼叫中心业务',
-    info: '多方通讯',
+    info: '呼叫中心业务',
   },
   {
     name: '文网文',
@@ -133,19 +133,17 @@ const cityRegexList = ref<[string, RegExp][]>([
 const cueWord = `
 ##要求
 提取公司名称、发证时间、许可证编号
-判断业务是否包含：ICP、EDI、IDC、CDN、ISP
+判断业务是否包含：ICP、EDI、IDC、CDN、ISP、多方通信
 判断类型是否是：许可证、受理通知书、批准通知书
 ##输出格式JSON；限制只输出json；
 {
 "corporate": "{{公司名称}}",
-"ref": "{{编号}}",
+"ref": "{{编号（{{地区短标识}} [年份]{{编号}}号）}}",
 "type": "{{类型}}",
-"issuance": "{{发证时间}}",
+"issuance": "{{发证时间(注意区分提交时间和发证时间，发证时间一般在最后)}}",
 "business": [{{业务代号}}]
 }
 ##备注
-####许可证编号格式为
-{{地区短标识}} 许可{{编号}}号
 ####类型对应输出数字
 许可证：1
 受理通知书：2
@@ -156,6 +154,7 @@ const cueWord = `
 互联网数据中心业务:IDC
 内容分发网络业务：CDN
 互联网接入服务业务：ISP
+多方通信服务业：多方通信
 `;
 const direction = ref<DrawerProps['direction']>('rtl');
 const drawerSize = ref('30%');
@@ -177,10 +176,31 @@ const handleImageRemove = (file: any, files: any) => {
     fileCurrent.value = undefined;
   }
 };
-const handleImageSuccess = (response: any, file: any, fileList: any) => {
+const handleImageSuccess = async (response: any, file: any, fileList: any) => {
+  if (!store.siliconflowApiKey) {
+    return;
+  }
   console.log(response);
-
   fileCurrent.value = response[0] || response;
+
+  // 获取上传图片的URL
+  const imageUrl = `https://strapi.phrynus.com${fileCurrent.value.url}`;
+
+  try {
+    // 调用硅基流动API进行图片识别
+    const result = await callSiliconFlowAPI(imageUrl);
+    if (result) {
+      // 根据API返回结果自动填充表单
+      autoFillForm(result);
+    }
+  } catch (error) {
+    console.error('图片识别失败:', error);
+    ElMessage({
+      message: '图片识别失败',
+      type: 'warning',
+      plain: true,
+    });
+  }
 };
 
 const uploadImage = (option: UploadRequestOptions) => {
@@ -204,6 +224,185 @@ const uploadImage = (option: UploadRequestOptions) => {
       console.log(err);
       onError(err);
     });
+};
+
+// 调用硅基流动API进行图片识别
+const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
+  try {
+    const loading = ElLoading.service({
+      lock: true,
+      text: '正在识别图片...',
+      background: 'rgba(255, 255, 255, 0.5)',
+    });
+
+    const response = await axios.post(
+      'https://api.siliconflow.cn/v1/chat/completions',
+      {
+        model: 'Pro/Qwen/Qwen2.5-VL-7B-Instruct',
+        messages: [
+          {
+            role: 'system',
+            content: cueWord,
+          },
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: '请分析这张图片中的许可证信息',
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: imageUrl,
+                },
+              },
+            ],
+          },
+        ],
+        temperature: 0,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${store.siliconflowApiKey || import.meta.env.VITE_SILICONFLOW_API_KEY || ''}`,
+        },
+      }
+    );
+
+    loading.close();
+
+    console.log('硅基流动API返回:', response.data);
+
+    if (response.data && response.data.choices && response.data.choices.length > 0) {
+      const content = response.data.choices[0].message.content;
+      // 尝试解析JSON响应
+      try {
+        // 查找JSON字符串
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const jsonStr = jsonMatch[0];
+          const result = JSON.parse(jsonStr);
+          return result;
+        }
+      } catch (error) {
+        console.error('解析JSON失败:', error, content);
+        ElMessage({
+          message: '无法解析识别结果',
+          type: 'warning',
+          plain: true,
+        });
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('调用硅基流动API失败:', error);
+    throw error;
+  }
+};
+
+// 根据API返回结果自动填充表单
+const autoFillForm = (result: any) => {
+  if (!result) return;
+
+  try {
+    // 填充公司名称
+    if (result.corporate) {
+      company.value = result.corporate;
+    }
+
+    // 填充许可证编号
+    if (result.ref) {
+      form.value.ref = result.ref;
+    }
+
+    // 填充证书类型
+    if (result.type) {
+      let typeNum = parseInt(result.type);
+      if (typeNum === 1) {
+        form.value.type = Type.value[0]; // 许可证
+      } else if (typeNum === 2) {
+        form.value.type = Type.value[1]; // 受理通知书
+      } else if (typeNum === 3) {
+        form.value.type = Type.value[2]; // 批准通知书
+      }
+    }
+
+    // 填充业务类型
+    if (result.business && Array.isArray(result.business) && result.business.length > 0) {
+      // 处理业务类型映射表（数字编号到业务名称的映射）
+      const businessCodeMap: { [key: string]: string } = {
+        '1': 'ICP',
+        '2': 'EDI',
+        '3': 'ISP',
+        '4': 'IDC',
+        '5': 'CDN',
+        '6': 'VPN',
+        '7': 'SP',
+        '8': '多方通讯',
+        '9': '呼叫中心业务',
+        '10': '文网文',
+        '11': '变更',
+      };
+
+      // 将业务数组转换为业务名称数组
+      const businessNames = result.business
+        .map((business: string | number) => {
+          // 如果是数字或数字字符串，尝试从映射表中获取对应的业务名称
+          if (typeof business === 'number' || !isNaN(Number(business))) {
+            return businessCodeMap[business.toString()] || '';
+          }
+          // 如果是字符串，直接使用
+          return business;
+        })
+        .filter(Boolean); // 过滤掉空字符串
+
+      // 将名称数组与Types数组匹配，只选择有效的业务类型
+      form.value.types = businessNames.filter((businessName: string) => {
+        return Types.value.some((type) => type.name === businessName);
+      });
+    }
+
+    // 填充发证时间
+    if (result.issuance) {
+      try {
+        // 检查是否是中文日期格式（如：2025年07月07日）
+        if (typeof result.issuance === 'string' && result.issuance.includes('年') && result.issuance.includes('月') && result.issuance.includes('日')) {
+          // 解析中文日期格式
+          const dateMatch = result.issuance.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+          if (dateMatch) {
+            const [_, year, month, day] = dateMatch;
+            // JavaScript月份是0-11，所以要减1
+            const issuanceDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            if (!isNaN(issuanceDate.getTime())) {
+              time.value = issuanceDate;
+            }
+          }
+        } else {
+          // 尝试标准日期格式解析
+          const issuanceDate = new Date(result.issuance);
+          if (!isNaN(issuanceDate.getTime())) {
+            time.value = issuanceDate;
+          }
+        }
+      } catch (e) {
+        console.error('解析日期失败:', e, result.issuance);
+      }
+    }
+
+    ElMessage({
+      message: '已自动填充识别到的信息',
+      type: 'success',
+      plain: true,
+    });
+  } catch (error) {
+    console.error('自动填充表单失败:', error);
+    ElMessage({
+      message: '自动填充表单失败',
+      type: 'error',
+      plain: true,
+    });
+  }
 };
 
 // 提交
@@ -342,7 +541,7 @@ onMounted(() => {
         <el-form-item label="公司名称:">
           <el-input v-model="company" placeholder="XXXX有限公司" />
         </el-form-item>
-        <el-form-item label="许可证编号:">
+        <el-form-item label="证书编号:">
           <el-input v-model="form.ref" placeholder="许可证编号" />
         </el-form-item>
         <el-form-item label="证书类型:">
@@ -394,6 +593,13 @@ onMounted(() => {
             </el-upload>
           </div>
         </el-form-item>
+
+        <el-form-item label="硅基流动:">
+          <el-input v-model="store.siliconflowApiKey" placeholder="请输入硅基流动API密钥" type="password" show-password />
+          <div class="api-key-note">
+            <small>上传图片后将自动识别许可证信息</small>
+          </div>
+        </el-form-item>
       </el-form>
     </template>
     <template #footer>
@@ -415,6 +621,11 @@ onMounted(() => {
       color: #8c939d;
     }
   }
+}
+
+.api-key-note {
+  margin-top: 5px;
+  color: #909399;
 }
 </style>
 <style>

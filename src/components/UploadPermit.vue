@@ -184,7 +184,7 @@ const handleImageSuccess = async (response: any, file: any, fileList: any) => {
   fileCurrent.value = response[0] || response;
 
   // 获取上传图片的URL
-  const imageUrl = `https://strapi.phrynus.com${fileCurrent.value.url}`;
+  const imageUrl = `https://strapi.phrynus.cn${fileCurrent.value.url}`;
 
   try {
     // 调用硅基流动API进行图片识别
@@ -208,7 +208,7 @@ const uploadImage = (option: UploadRequestOptions) => {
   const fmData = new FormData();
   fmData.append(option.filename, file, file.name);
   axios
-    .post('https://strapi.phrynus.com/api/upload', fmData, {
+    .post('https://strapi.phrynus.cn/api/upload', fmData, {
       headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${store.token}` },
       onUploadProgress: (event: AxiosProgressEvent) => {
         if (event.total) {
@@ -465,7 +465,7 @@ const onSubmit = async () => {
   const dataTime = new Date((time.value || new Date()).valueOf() + 8 * 60 * 60 * 1000).toISOString().split('T')[0];
   await axios
     .post(
-      'https://strapi.phrynus.com/api/permits',
+      'https://strapi.phrynus.cn/api/permits',
       {
         data: {
           company: company.value,
@@ -567,7 +567,7 @@ onMounted(() => {
           <div class="image-selector">
             <!-- 图片选择器 -->
             <el-upload
-              action="https://strapi.phrynus.com/api/upload"
+              action="https://strapi.phrynus.cn/api/upload"
               list-type="picture"
               :on-remove="handleImageRemove"
               :on-success="handleImageSuccess"

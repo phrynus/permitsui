@@ -102,7 +102,7 @@ const drawCanvasRectangles = ref<
   }[]
 >([]);
 // const imgEditUrl = ref("https://strapi-cdn.phrynus.com"); // 当前编辑图片URL
-const imgEditUrl = ref('https://strapi.phrynus.com'); // 当前编辑图片URL
+const imgEditUrl = ref('https://strapi.phrynus.cn'); // 当前编辑图片URL
 const message = ref<MessageHandler>(); // 消息提示实例
 
 // ============== 核心功能方法 ==============
@@ -180,7 +180,7 @@ const apiGo = async (load = true) => {
   try {
     // 发起API请求
     await axios
-      .get(`https://strapi.phrynus.com/api/permits?${getQuery()}`, {
+      .get(`https://strapi.phrynus.cn/api/permits?${getQuery()}`, {
         headers: {
           Authorization: `Bearer ${store.token}`, // 携带认证token
         },
@@ -563,7 +563,7 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
   if (imageViewerId.value) {
     // 更新后端数据
     axios.put(
-      `https://strapi.phrynus.com/api/permits/${imageViewerId.value}`,
+      `https://strapi.phrynus.cn/api/permits/${imageViewerId.value}`,
       {
         data: { mosaic: list },
       },

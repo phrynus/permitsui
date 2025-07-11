@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ref, onMounted, watch } from "vue";
-import Icon from "@/components/Icon.vue";
-import { userestStore } from "@/stores/rest";
-import { useRouter, useRoute } from "vue-router";
+import { ref, onMounted, watch } from 'vue';
+import Icon from '@/components/Icon.vue';
+import { userestStore } from '@/stores/rest';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
 const route = useRoute();
@@ -11,12 +11,12 @@ const store: any = userestStore();
 const setExplore = (name: string) => {
   store.explore = name;
   if (!name) {
-    store.tags = "";
-    store.areas = "";
-    store.search = "";
+    store.tags = '';
+    store.areas = '';
+    store.search = '';
   }
-  if (route.path !== "/") {
-    router.push("/");
+  if (route.path !== '/') {
+    router.push('/');
   }
 };
 onMounted(() => {
@@ -36,27 +36,27 @@ onMounted(() => {
         <div class="item a" :class="store.explore == 'A' ? 'on' : ''">
           <a @click="setExplore('A')">
             <Icon name="iconsurvey" />
-            <span>许可</span>
+            <span>许可证</span>
           </a>
         </div>
         <div class="item b" :class="store.explore == 'B' ? 'on' : ''">
           <a @click="setExplore('B')">
             <Icon name="iconimage-text" />
-            <span>受理</span>
+            <span>受理通知书</span>
           </a>
         </div>
         <div class="item c" :class="store.explore == 'C' ? 'on' : ''">
           <a @click="setExplore('C')">
             <Icon name="iconimage-text" />
-            <span>批准</span>
+            <span>批准通知书</span>
           </a>
         </div>
-        <div class="item c">
+        <!-- <div class="item c">
           <a>
             <Icon name="iconedit" />
             <span>简述</span>
           </a>
-        </div>
+        </div> -->
 
         <!-- <div class="item wx">
           <a href="https://work.weixin.qq.com/kfid/kfcab32b37de696f61d">
@@ -114,7 +114,7 @@ onMounted(() => {
         background-color: #00000000 !important;
         position: relative;
         &::before {
-          content: "";
+          content: '';
           position: absolute;
           width: 100%;
           height: 2px;

@@ -2,6 +2,7 @@
 import { onMounted, ref, defineProps, watch, reactive } from 'vue';
 import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from 'element-plus';
 import { userestStore } from '@/stores/rest';
+import { useSiliconFlowStore, modelOptions } from '@/stores/siliconflow';
 // Element Plus 组件
 import { ElMessage, ElLoading, ElMessageBox } from 'element-plus';
 // HTTP 请求库
@@ -10,6 +11,7 @@ import type { AxiosProgressEvent } from 'axios';
 // 自定义图标组件
 import Icon from '@/components/Icon.vue';
 const store: any = userestStore();
+const siliconFlowStore = useSiliconFlowStore();
 const props = defineProps({
   switch: {
     type: Boolean,
@@ -174,10 +176,11 @@ const form = ref({
 const handleImageRemove = (file: any, files: any) => {
   if (files.length == 0) {
     fileCurrent.value = undefined;
+    resetForm(); // 当移除所有图片时清空表单
   }
 };
 const handleImageSuccess = async (response: any, file: any, fileList: any) => {
-  if (!store.siliconflowApiKey) {
+  if (!siliconFlowStore.apiKey) {
     return;
   }
   console.log(response);
@@ -227,6 +230,19 @@ const uploadImage = (option: UploadRequestOptions) => {
 };
 
 // 调用硅基流动API进行图片识别
+// 清空表单
+const resetForm = () => {
+  form.value = {
+    type: '',
+    imgs: '',
+    types: [],
+    area: '',
+    ref: '',
+  };
+  company.value = '';
+  time.value = undefined;
+};
+
 const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
   const loading = ElLoading.service({
     lock: true,
@@ -234,11 +250,14 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
     background: 'rgba(255, 255, 255, 0.5)',
   });
 
+  // 在发送前清空表单
+  resetForm();
+
   try {
     const response = await axios.post(
       'https://api.siliconflow.cn/v1/chat/completions',
       {
-        model: 'Pro/Qwen/Qwen2.5-VL-7B-Instruct',
+        model: siliconFlowStore.currentModel,
         messages: [
           {
             role: 'system',
@@ -249,7 +268,7 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
             content: [
               {
                 type: 'text',
-                text: `请分析这张图片中的许可证信息，日期不可能超过${new Date().getFullYear()}年${new Date().getMonth() + 1}月${new Date().getDate()}号`,
+                text: `请分析这张图片中的许可证信息;日期不可能超过${new Date().getFullYear()}年${new Date().getMonth() + 1}月${new Date().getDate()}号`,
               },
               {
                 type: 'image_url',
@@ -260,12 +279,12 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
             ],
           },
         ],
-        temperature: 0.5,
+        temperature: 0.7,
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${store.siliconflowApiKey || import.meta.env.VITE_SILICONFLOW_API_KEY || ''}`,
+          Authorization: `Bearer ${siliconFlowStore.apiKey || import.meta.env.VITE_SILICONFLOW_API_KEY || ''}`,
         },
       }
     );
@@ -278,10 +297,22 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
       const content = response.data.choices[0].message.content;
       // 尝试解析JSON响应
       try {
-        // 查找JSON字符串
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const jsonStr = jsonMatch[0];
+        // 处理可能的Markdown格式
+        let jsonStr = '';
+
+        // 尝试匹配Markdown代码块格式 ```json {...} ```
+        const mdMatch = content.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+        if (mdMatch && mdMatch[1]) {
+          jsonStr = mdMatch[1].trim();
+        } else {
+          // 如果不是Markdown格式，尝试直接匹配JSON对象
+          const jsonMatch = content.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            jsonStr = jsonMatch[0];
+          }
+        }
+
+        if (jsonStr) {
           const result = JSON.parse(jsonStr);
           return result;
         }
@@ -302,9 +333,43 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
   }
 };
 
+// 重新识别图片
+const reidentifyImage = async () => {
+  if (!fileCurrent.value || !fileCurrent.value.url) {
+    ElMessage({
+      message: '请先上传图片',
+      type: 'warning',
+      plain: true,
+    });
+    return;
+  }
+
+  try {
+    const imageUrl = `https://strapi.phrynus.cn${fileCurrent.value.url}`;
+    const result = await callSiliconFlowAPI(imageUrl);
+    if (result) {
+      autoFillForm(result);
+    }
+  } catch (error) {
+    console.error('图片重新识别失败:', error);
+    ElMessage({
+      message: '图片重新识别失败',
+      type: 'error',
+      plain: true,
+    });
+  }
+};
+
 // 根据API返回结果自动填充表单
 const autoFillForm = (result: any) => {
-  if (!result) return;
+  if (!result) {
+    ElMessage({
+      message: '无法解析识别结果',
+      type: 'warning',
+      plain: true,
+    });
+    return;
+  }
 
   try {
     // 填充公司名称
@@ -501,15 +566,7 @@ const onSubmit = async () => {
       store.refresh = !store.refresh;
       props.onClose();
       // 清空表单
-      form.value = {
-        type: '',
-        imgs: '',
-        types: [],
-        area: '',
-        ref: '',
-      };
-      company.value = '';
-      time.value = undefined;
+      resetForm();
       fileCurrent.value = undefined;
       fileList.value = [];
     });
@@ -588,7 +645,7 @@ onMounted(() => {
               name="files"
               :http-request="uploadImage"
             >
-              <div class="icoBox">
+              <div v-if="!fileCurrent || !fileCurrent.url" class="icoBox">
                 <Icon name="iconshangchuan" />
               </div>
             </el-upload>
@@ -596,10 +653,23 @@ onMounted(() => {
         </el-form-item>
 
         <el-form-item label="硅基流动:">
-          <el-input v-model="store.siliconflowApiKey" placeholder="请输入硅基流动API密钥" type="password" show-password />
+          <el-input v-model="siliconFlowStore.apiKey" placeholder="请输入硅基流动API密钥" type="password" show-password />
           <div class="api-key-note">
             <small>上传图片后将自动识别许可证信息</small>
           </div>
+        </el-form-item>
+
+        <el-form-item label="模型选择:">
+          <el-select v-model="siliconFlowStore.currentModel" placeholder="请选择模型" style="width: 100%">
+            <el-option v-for="option in modelOptions" :key="option.value" :label="`${option.name} (${option.price})`" :value="option.value" />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item v-if="fileCurrent && fileCurrent.url">
+          <el-button @click="reidentifyImage" type="primary" plain style="width: 100%">
+            <Icon name="iconshangchuan" style="margin-right: 5px" />
+            重新识别图片
+          </el-button>
         </el-form-item>
       </el-form>
     </template>

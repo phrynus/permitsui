@@ -157,6 +157,7 @@ const cueWord = `
 内容分发网络业务：CDN
 互联网接入服务业务：ISP
 多方通信服务业：多方通信
+出版物：出版物
 `;
 const direction = ref<DrawerProps['direction']>('rtl');
 const drawerSize = ref('30%');

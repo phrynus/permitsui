@@ -7,7 +7,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import Icon from '@/components/Icon.vue';
-import ElementPlus from 'element-plus';
+import ElementPlu from 'element-plus';
 
 // element css
 import 'element-plus/dist/index.css';
@@ -22,9 +22,9 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 app.use(pinia);
 app.use(router);
-app.use(ElementPlus, {
-  locale: zhCn,
-});
+// app.use(ElementPlus, {
+//   locale: zhCn,
+// });
 app.component('Icon', Icon);
 
 app.mount('#app');

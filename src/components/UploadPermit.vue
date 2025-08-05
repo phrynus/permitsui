@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, defineProps, watch, reactive } from 'vue';
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from 'element-plus';
 import { userestStore } from '@/stores/rest';
 import { useSiliconFlowStore, modelOptions } from '@/stores/siliconflow';
@@ -595,37 +596,37 @@ onMounted(() => {
 });
 </script>
 <template>
-  <el-drawer v-model="props.switch" :size="drawerSize" :direction="direction" :before-close="props.onClose">
+  <el-drawer :locale="zhCn" v-model="props.switch" :size="drawerSize" :direction="direction" :before-close="props.onClose">
     <template #header>
       <h4>上传资料上传</h4>
     </template>
     <template #default>
-      <el-form :model="form" label-width="auto" style="max-width: 600px">
-        <el-form-item label="公司名称:">
-          <el-input v-model="company" placeholder="XXXX有限公司" />
+      <el-form  :locale="zhCn" :model="form" label-width="auto" style="max-width: 600px">
+        <el-form-item  :locale="zhCn" label="公司名称:">
+          <el-input :locale="zhCn" v-model="company" placeholder="XXXX有限公司" />
         </el-form-item>
-        <el-form-item label="证书编号:">
-          <el-input v-model="form.ref" placeholder="许可证编号" />
+        <el-form-item :locale="zhCn" label="证书编号:">
+          <el-input :locale="zhCn" v-model="form.ref" placeholder="许可证编号" />
         </el-form-item>
-        <el-form-item label="证书类型:">
-          <el-select placement="left" v-model="form.type" placeholder="许可证、受理通知书、批准通知书">
+        <el-form-item :locale="zhCn" label="证书类型:">
+          <el-select :locale="zhCn" placement="left" v-model="form.type" placeholder="许可证、受理通知书、批准通知书">
             <el-option v-for="time in Type" :key="time" :label="time.replace(/[\s\S]{2}/, '')" :value="time" />
           </el-select>
         </el-form-item>
-        <el-form-item label="业务种类:">
-          <el-select placement="left" v-model="form.types" :multiple="true" placeholder="ICP、EDI">
-            <el-option v-for="time in Types" :key="time.name" :label="time.info" :value="time.name" />
+        <el-form-item :locale="zhCn" label="业务种类:">
+          <el-select :locale="zhCn" placement="left" v-model="form.types" :multiple="true" placeholder="ICP、EDI">
+            <el-option :locale="zhCn" v-for="time in Types" :key="time.name" :label="time.info" :value="time.name" />
           </el-select>
         </el-form-item>
-        <el-form-item label="地区:">
-          <el-select placement="left" v-model="form.area" placeholder="安徽、北京">
-            <el-option v-for="time in Area" :key="time" :label="time.replace(/[\s\S]{3}/, '')" :value="time" />
+        <el-form-item :locale="zhCn" label="地区:">
+          <el-select :locale="zhCn" placement="left" v-model="form.area" placeholder="安徽、北京">
+            <el-option :locale="zhCn" v-for="time in Area" :key="time" :label="time.replace(/[\s\S]{3}/, '')" :value="time" />
           </el-select>
         </el-form-item>
-        <el-form-item label="时间:">
-          <el-date-picker placement="left" v-model="time" format="YYYY-MM-DD" type="date" placeholder="发证日期" style="width: 100%" />
+        <el-form-item :locale="zhCn" label="时间:">
+          <el-date-picker :locale="zhCn" placement="left" v-model="time" format="YYYY-MM-DD" type="date" placeholder="发证日期" style="width: 100%" />
         </el-form-item>
-        <el-form-item label="图片:">
+        <el-form-item :locale="zhCn" label="图片:">
           <div class="image-selector">
             <!-- 图片选择器 -->
             <el-upload
@@ -657,21 +658,21 @@ onMounted(() => {
           </div>
         </el-form-item>
 
-        <el-form-item label="硅基流动:">
-          <el-input v-model="siliconFlowStore.apiKey" placeholder="请输入硅基流动API密钥" type="password" show-password />
+        <el-form-item :locale="zhCn" label="硅基流动:">
+          <el-input :locale="zhCn" v-model="siliconFlowStore.apiKey" placeholder="请输入硅基流动API密钥" type="password" show-password />
           <div class="api-key-note">
             <small>上传图片后将自动识别许可证信息</small>
           </div>
         </el-form-item>
 
-        <el-form-item label="模型选择:">
-          <el-select v-model="siliconFlowStore.currentModel" placeholder="请选择模型" style="width: 100%">
-            <el-option v-for="option in modelOptions" :key="option.value" :label="`${option.name} (${option.price})`" :value="option.value" />
+        <el-form-item :locale="zhCn" label="模型选择:">
+          <el-select :locale="zhCn" v-model="siliconFlowStore.currentModel" placeholder="请选择模型" style="width: 100%">
+            <el-option  :locale="zhCn" v-for="option in modelOptions" :key="option.value" :label="`${option.name} (${option.price})`" :value="option.value" />
           </el-select>
         </el-form-item>
 
-        <el-form-item v-if="fileCurrent && fileCurrent.url">
-          <el-button @click="reidentifyImage" type="primary" plain style="width: 100%">
+        <el-form-item :locale="zhCn" v-if="fileCurrent && fileCurrent.url">
+          <el-button :locale="zhCn" @click="reidentifyImage" type="primary" plain style="width: 100%">
             <Icon name="iconshangchuan" style="margin-right: 5px" />
             重新识别图片
           </el-button>
@@ -680,7 +681,7 @@ onMounted(() => {
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button @click="onSubmit" type="primary">提交</el-button>
+        <el-button :locale="zhCn" @click="onSubmit" type="primary">提交</el-button>
       </div>
     </template>
   </el-drawer>

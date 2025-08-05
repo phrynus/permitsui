@@ -3,6 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import Icon from '@/components/Icon.vue';
 import { userestStore } from '@/stores/rest';
 import { useRouter, useRoute } from 'vue-router';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
 
 const router = useRouter();
 const route = useRoute();
@@ -25,7 +26,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="explore_box">
-    <el-scrollbar>
+    <el-scrollbar :locale="zhCn">
       <div class="explore">
         <div class="item index" :class="store.explore == '' ? 'on' : ''">
           <a @click="setExplore('')">

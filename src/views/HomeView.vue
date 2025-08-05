@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // ============== 依赖导入 ==============
 // Vue 核心功能
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import { ref, onMounted, watch, getCurrentInstance } from 'vue';
 // 查询字符串处理库
 import qs from 'qs';
@@ -636,6 +637,7 @@ onMounted(async () => {
 <template>
   <!-- 主滚动容器 -->
   <el-scrollbar
+    :locale="zhCn"
     @scroll="scroll"
     :class="{
       home: true,
@@ -675,7 +677,7 @@ onMounted(async () => {
         <a>
           <!-- 缩略图 -->
           <div class="img" @click="goMoulds(item.documentId)">
-            <el-image :src="imgEditUrl + item.img?.formats.small.url" lazy />
+            <el-image :locale="zhCn" :src="imgEditUrl + item.img?.formats.small.url" lazy />
           </div>
 
           <!-- 卡片底部信息 -->
@@ -700,12 +702,13 @@ onMounted(async () => {
       </div>
     </wc-waterfall>
     <!-- 图片查看器 -->
-    <el-image-viewer v-if="imageViewerShow" @close="imageViewerShow = false" :url-list="imageViewerList" hide-on-click-modal @switch="(i: number) => imageViewerIndex = i">
+    <el-image-viewer :locale="zhCn" v-if="imageViewerShow" @close="imageViewerShow = false" :url-list="imageViewerList" hide-on-click-modal @switch="(i: number) => imageViewerIndex = i">
       <!-- 自定义工具栏 -->
       <template #toolbar="{ activeIndex }">
         <!-- 水印文字输入 -->
-        <el-tooltip content="水印文本,输入后回车确认" placement="top" effect="light">
+        <el-tooltip :locale="zhCn" content="水印文本,输入后回车确认" placement="top" effect="light">
           <el-input
+            :locale="zhCn"
             class="imageViewerInput"
             :disabled="imgTextDisabled"
             v-model="imageViewerInputV"
@@ -718,7 +721,7 @@ onMounted(async () => {
             style="width: 240px"
           />
         </el-tooltip>
-        <el-tooltip content="水印" placement="top" effect="light">
+        <el-tooltip :locale="zhCn" content="水印" placement="top" effect="light">
           <Icon
             :c="true"
             @click="
@@ -731,7 +734,7 @@ onMounted(async () => {
             :name="watermarkText.watermark && watermarkText.text != '' ? 'iconwenzixiaoguo-copy' : 'iconwenzixiaoguo'"
           />
         </el-tooltip>
-        <el-tooltip content="打码 / 长按编辑打码" placement="top" effect="light">
+        <el-tooltip :locale="zhCn" content="打码 / 长按编辑打码" placement="top" effect="light">
           <Icon
             :c="true"
             @mousedown="startPress"
@@ -745,7 +748,7 @@ onMounted(async () => {
           />
         </el-tooltip>
         <!-- 下载按钮 -->
-        <el-tooltip content="下载" placement="top" effect="light">
+        <el-tooltip :locale="zhCn" content="下载" placement="top" effect="light">
           <Icon :c="true" @click="download(activeIndex)" name="icondownload" />
         </el-tooltip>
       </template>

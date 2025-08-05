@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import Icon from "@/components/Icon.vue";
-import api from "@/utils/axios";
-import { useRouter, useRoute } from "vue-router";
-import { ElMessage, ElLoading, ElNotification, ElImage, ElImageViewer, ElRate } from "element-plus";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import { Swiper, SwiperSlide } from "swiper/vue";
-import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
-import { userestStore } from "@/stores/rest";
+import { ref, onMounted, watch } from 'vue';
+import Icon from '@/components/Icon.vue';
+import api from '@/utils/axios';
+import { useRouter, useRoute } from 'vue-router';
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
+import { ElMessage, ElLoading, ElNotification, ElImage, ElImageViewer, ElRate } from 'element-plus';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { userestStore } from '@/stores/rest';
 
 const store: any = userestStore();
 
@@ -34,9 +35,9 @@ onMounted(async () => {});
 </script>
 <template>
   <div style="height: 100%; position: relative">
-    <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>{{ mould?.title || "" }}</el-breadcrumb-item>
+    <el-breadcrumb :locale="zhCn" separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :locale="zhCn" :to="{ path: '/' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :locale="zhCn">{{ mould?.title || '' }}</el-breadcrumb-item>
     </el-breadcrumb>
 
     <div class="mould-content">
@@ -45,6 +46,7 @@ onMounted(async () => {});
           <swiper fit="cover" :navigation="true" :pagination="true" :modules="modules">
             <swiper-slide v-for="(item, index) in mould?.images?.data" :key="index">
               <el-image
+                :locale="zhCn"
                 @click="
                   imgsBox = true;
                   imgsBoxIndex = index;
@@ -73,15 +75,7 @@ onMounted(async () => {});
     </div>
 
     <div class="isError" v-if="isError"></div>
-    <el-image-viewer
-      v-if="imgsBox"
-      :hide-on-click-modal="true"
-      :teleported="true"
-      @close="imgsBox = false"
-      :url-list="srcList"
-      :initial-index="imgsBoxIndex"
-      :z-index="100000"
-    />
+    <el-image-viewer :locale="zhCn" v-if="imgsBox" :hide-on-click-modal="true" :teleported="true" @close="imgsBox = false" :url-list="srcList" :initial-index="imgsBoxIndex" :z-index="100000" />
   </div>
 </template>
 <style lang="scss" scoped>

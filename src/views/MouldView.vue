@@ -7,9 +7,8 @@ const route = useRoute();
 const store: any = userestStore();
 
 try {
-  if (route.params.key) {
-    console.log(route.params.key);
-    store.token = route.params.key;
+  if (route.params.token) {
+    store.token = route.params.token;
     router.push({ path: '/' });
   }
 } catch (error) {

@@ -8,7 +8,7 @@ import { userestStore } from '@/stores/rest';
 
 const router = createRouter({
   // hash 模式
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',
@@ -21,7 +21,7 @@ const router = createRouter({
         },
         {
           // 匹配id
-          path: ':key',
+          path: 'token/:token',
           // 动态载入
           component: () => import('~/views/MouldView.vue'),
         },

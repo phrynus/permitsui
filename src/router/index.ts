@@ -1,33 +1,33 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router';
 // 框架
-import Index from "~/layouts/Index.vue";
+import Index from '~/layouts/Index.vue';
 //
-import HomeView from "~/views/HomeView.vue";
+import HomeView from '~/views/HomeView.vue';
 
-import { userestStore } from "@/stores/rest";
+import { userestStore } from '@/stores/rest';
 
 const router = createRouter({
   // hash 模式
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: [
     {
-      path: "/",
-      name: "home",
+      path: '/',
+      name: 'home',
       component: Index,
       children: [
         {
-          path: "",
-          component: HomeView
+          path: '',
+          component: HomeView,
         },
         {
           // 匹配id
-          path: ":id",
+          path: ':key',
           // 动态载入
-          component: () => import("~/views/MouldView.vue")
-        }
-      ]
-    }
-  ]
+          component: () => import('~/views/MouldView.vue'),
+        },
+      ],
+    },
+  ],
 });
 router.beforeEach((to, from, next) => {
   // const { token }: any = userestStore();

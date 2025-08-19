@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref, defineProps, watch, reactive } from 'vue';
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from 'element-plus';
 import { userestStore } from '@/stores/rest';
 import { useSiliconFlowStore, modelOptions } from '@/stores/siliconflow';
@@ -121,7 +121,7 @@ const cityRegexList = ref<[string, RegExp][]>([
   ['湖北', /(?:湖北|武汉|黄石|十堰|宜昌|襄阳|鄂州|荆门|孝感|荆州|黄冈|咸宁|随州|仙桃|潜江|天门)[省市]?/],
   ['湖南', /(?:湖南|长沙|株洲|湘潭|衡阳|邵阳|岳阳|常德|张家界|益阳|郴州|永州|怀化|娄底)[省市]?/],
   ['吉林', /(?:长春|吉林|四平|辽源|通化|白山|松原|白城)[省市]?/],
-  ['江苏', /(?:江苏|南京|无锡|徐州|常州|苏州|南通|连云港|淮安|盐城|扬州|镇江|泰州|宿迁)[省市]?/],
+  ['江苏', /(?:江苏|南京|无锡|徐州|常州|苏州|南通|连云港|淮安|盐城|扬州|镇江|泰州|宿迁|张家港)[省市]?/],
   ['江西', /(?:江西|南昌|景德镇|萍乡|九江|新余|鹰潭|赣州|吉安|宜春|抚州|上饶)[省市]?/],
   ['辽宁', /(?:辽宁|沈阳|大连|鞍山|抚顺|本溪|丹东|锦州|营口|阜新|辽阳|盘锦|铁岭|朝阳|葫芦岛)[省市]?/],
   ['内蒙古', /(?:内蒙古|呼和浩特|包头|乌海|赤峰|通辽|鄂尔多斯|呼伦贝尔|巴彦淖尔|乌兰察布)[省市]?/],
@@ -601,8 +601,8 @@ onMounted(() => {
       <h4>上传资料上传</h4>
     </template>
     <template #default>
-      <el-form  :locale="zhCn" :model="form" label-width="auto" style="max-width: 600px">
-        <el-form-item  :locale="zhCn" label="公司名称:">
+      <el-form :locale="zhCn" :model="form" label-width="auto" style="max-width: 600px">
+        <el-form-item :locale="zhCn" label="公司名称:">
           <el-input :locale="zhCn" v-model="company" placeholder="XXXX有限公司" />
         </el-form-item>
         <el-form-item :locale="zhCn" label="证书编号:">
@@ -667,7 +667,7 @@ onMounted(() => {
 
         <el-form-item :locale="zhCn" label="模型选择:">
           <el-select :locale="zhCn" v-model="siliconFlowStore.currentModel" placeholder="请选择模型" style="width: 100%">
-            <el-option  :locale="zhCn" v-for="option in modelOptions" :key="option.value" :label="`${option.name} (${option.price})`" :value="option.value" />
+            <el-option :locale="zhCn" v-for="option in modelOptions" :key="option.value" :label="`${option.name} (${option.price})`" :value="option.value" />
           </el-select>
         </el-form-item>
 

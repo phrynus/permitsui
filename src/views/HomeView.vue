@@ -695,6 +695,10 @@ onMounted(async () => {
                 <a v-for="tag in item.types" class="tag-link" :class="{ on: tag == store.tags }">
                   {{ tag }}
                 </a>
+                <a v-if="item.time" class="tag-link tag-time">
+                  <!-- 剪切去掉前两个字符 -->
+                  {{ item.time.slice(2) }}
+                </a>
               </div>
             </div>
           </div>
@@ -918,8 +922,8 @@ onMounted(async () => {
             .tag {
               display: flex;
               flex-wrap: wrap;
-              height: 24px;
-              overflow: hidden;
+              // height: 24px;
+              // overflow: hidden;
 
               a {
                 display: block;

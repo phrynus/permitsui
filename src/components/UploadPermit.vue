@@ -58,8 +58,8 @@ const Types = ref([
     info: '多方通信',
   },
   {
-    name: '呼叫中心业务',
-    info: '呼叫中心业务',
+    name: '呼叫中心',
+    info: '呼叫中心',
   },
   {
     name: '文网文',
@@ -145,20 +145,20 @@ const cueWord = `
 ##输出格式JSON；限制只输出json；
 {
 "corporate": "{{公司名称}}",
-"ref": "{{编号（{{地区短标识}} [年份]{{编号}}号）}}",
+"ref": "{{地区短标识}} {{编号}} 号",
 "type": "{{类型}}",
 "issuance": "{{发证时间(注意区分提交时间和发证时间，发证时间一般在最后)}}",
 "business": [{{业务代号}}]
 }
 ##备注
-####类型对应输出数字
+###类型对应输出数字
 许可证：1
 受理通知书：2
 批准通知书：3
-####业务代号
+###业务代号
 信息服务业务(仅限互联网信息服务)：ICP
 在线数据处理与交易处理业务：EDI
-互联网数据中心业务:IDC
+互联网数据中心业务：IDC
 内容分发网络业务：CDN
 互联网接入服务业务：ISP
 多方通信服务业：多方通信
@@ -290,9 +290,9 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${siliconFlowStore.apiKey || import.meta.env.VITE_SILICONFLOW_API_KEY || ''}`,
+          Authorization: `Bearer ${siliconFlowStore.apiKey || ''}`,
         },
-      }
+      },
     );
 
     loading.close();
@@ -552,7 +552,7 @@ const onSubmit = async () => {
         headers: {
           Authorization: `Bearer ${store.token}`,
         },
-      }
+      },
     )
     .catch((err) => {
       loading.close();

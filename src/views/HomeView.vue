@@ -37,7 +37,7 @@ const screenBox: any = ref(false);
 const { proxy } = getCurrentInstance()!;
 
 // 可选的许可证类型标签
-const tags: any = ref(['ICP', 'EDI', 'ISP', 'IDC', 'CDN', 'VPN', 'SP', '多方通信', '出版物', '呼叫中心业务', '文网文', '变更']);
+const tags: any = ref(['ICP', 'EDI', 'ISP', 'IDC', 'CDN', 'VPN', 'SP', '多方通信', '出版物', '呼叫中心', '文网文', '变更']);
 
 // 可选地区列表
 const areas = ref([
@@ -127,22 +127,31 @@ const screen = () => {
  */
 const getQuery = () => {
   // 构建过滤条件
-  let filters: any = {
-    $and: [
-      { types: { $contains: store.tags } }, // 类型筛选
-      { area: { $contains: store.areas } }, // 地区筛选
-      { type: { $contains: store.explore } }, // 探索类型筛选
-      { company: { $contains: store.search } }, // 公司名称搜索
-    ],
-  };
-  // 当探索类型为'sp'时，排除ISP类型
-  if (store.tags == 'SP') {
-    filters.$and.push({
-      types: {
-        $not: { $contains: 'ISP' }, // 添加排除ISP的条件
-      },
-    });
+  const filterClauses: any[] = [];
+
+  // types (multi-select, JSONB 数组) - 仅在有选择时加入查询
+  // 不使用 $contains（会生成 JSONB ~~ LIKE，PostgreSQL 不支持）
+  // 改用 $or + $eqi 对每个选中标签做精确匹配
+  if (store.tags) {
+    filterClauses.push({ types: { $eqi: store.tags } });
   }
+
+  // area (枚举, 精确匹配)
+  if (store.areas) {
+    filterClauses.push({ area: { $eq: store.areas } });
+  }
+
+  // type (枚举前缀, 精确匹配)
+  if (store.explore) {
+    filterClauses.push({ type: { $eq: store.explore } });
+  }
+
+  // company (字符串, 模糊匹配) - 仅在有输入时加入查询
+  if (store.search) {
+    filterClauses.push({ company: { $contains: store.search } });
+  }
+
+  const filters = filterClauses.length > 0 ? { $and: filterClauses } : {};
 
   // 序列化为查询字符串
   return qs.stringify(
@@ -155,7 +164,7 @@ const getQuery = () => {
         pageSize: pageSize.value,
       },
     },
-    { encodeValuesOnly: true } // 保持URL整洁
+    { encodeValuesOnly: true }, // 保持URL整洁
   );
 };
 
@@ -281,19 +290,19 @@ const goMoulds = async (id: any) => {
   try {
     // 获取当前许可证数据
     let mould = moulds.value.filter((item: any) => item.documentId === id)[0];
-    let img = mould.img.size > 4096 || mould.img.width > 4096 ? mould.img.formats.large.url : mould.img.url;
-
     imageViewerMould.value = mould;
+
+    // 构建图片列表（取大图或原图）
+    let rawImgs = (mould.img || []).map((f: any) => (f.size > 4096 || f.width > 4096 ? f.formats.large.url : f.url));
 
     // 为每张图片添加水印
     if (watermarkText.watermark || watermarkText.mosaic) {
-      img = await watermark(watermarkText.text || '', img, imgEditUrl.value);
+      imageViewerList.value = await Promise.all(rawImgs.map((img: string) => watermark(watermarkText.text || '', img, imgEditUrl.value)));
     } else {
-      img = imgEditUrl.value + img;
+      imageViewerList.value = rawImgs.map((img: string) => imgEditUrl.value + img);
     }
     // 显示图片查看器
     imageViewerShow.value = true;
-    imageViewerList.value = [img];
     imageViewerId.value = id;
     imageViewerIndex.value = 0;
   } finally {
@@ -383,7 +392,7 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
  * @returns {Function} 防抖处理后的函数
  */
 function debounce(fn: Function, wait: number) {
-  let timeout: number | undefined;
+  let timeout: NodeJS.Timeout | undefined;
   return function (this: any, ...args: any[]) {
     const that = this;
     clearTimeout(timeout);
@@ -441,17 +450,18 @@ const watermarkTextWatch = debounce(async () => {
     try {
       // 重新生成带水印的图片
       let mould = moulds.value.filter((item: any) => item.documentId === imageViewerId.value)[0];
-      let img = mould.img.size > 4096 || mould.img.width > 4096 ? mould.img.formats.large.url : mould.img.url;
       imageViewerMould.value = mould;
+
+      // 构建图片列表（取大图或原图）
+      let rawImgs = (mould.img || []).map((f: any) => (f.size > 4096 || f.width > 4096 ? f.formats.large.url : f.url));
 
       // 为每张图片添加水印
       if (watermarkText.watermark || watermarkText.mosaic) {
-        img = await watermark(watermarkText.text || '', img, imgEditUrl.value);
+        imageViewerList.value = await Promise.all(rawImgs.map((img: string) => watermark(watermarkText.text || '', img, imgEditUrl.value)));
       } else {
-        img = imgEditUrl.value + img;
+        imageViewerList.value = rawImgs.map((img: string) => imgEditUrl.value + img);
       }
 
-      imageViewerList.value = [img]; // 更新查看器图片
       const input: any = document.querySelector('.imageViewerInput'); // 重新聚焦输入框
       input.focus();
     } finally {
@@ -572,7 +582,7 @@ const drawCanvasClose = (list: { x: number; y: number; width: number; height: nu
         headers: {
           Authorization: `Bearer ${store.token}`,
         },
-      }
+      },
     );
 
     // 更新前端状态
@@ -677,7 +687,7 @@ onMounted(async () => {
         <a>
           <!-- 缩略图 -->
           <div class="img" @click="goMoulds(item.documentId)">
-            <el-image :locale="zhCn" :src="imgEditUrl + item.img?.formats.small.url" lazy />
+            <el-image :locale="zhCn" :src="imgEditUrl + item.img?.[0]?.formats?.small?.url" lazy />
           </div>
 
           <!-- 卡片底部信息 -->
@@ -706,7 +716,7 @@ onMounted(async () => {
       </div>
     </wc-waterfall>
     <!-- 图片查看器 -->
-    <el-image-viewer :locale="zhCn" v-if="imageViewerShow" @close="imageViewerShow = false" :url-list="imageViewerList" hide-on-click-modal @switch="(i: number) => imageViewerIndex = i">
+    <el-image-viewer :locale="zhCn" v-if="imageViewerShow" @close="imageViewerShow = false" :url-list="imageViewerList" hide-on-click-modal @switch="(i: number) => (imageViewerIndex = i)">
       <!-- 自定义工具栏 -->
       <template #toolbar="{ activeIndex }">
         <!-- 水印文字输入 -->
@@ -716,11 +726,12 @@ onMounted(async () => {
             class="imageViewerInput"
             :disabled="imgTextDisabled"
             v-model="imageViewerInputV"
-            @keyup="(event: any) => {
-              if(event.keyCode==13){
-                watermarkText.text = imageViewerInputV
+            @keyup="
+              (event: any) => {
+                if (event.keyCode == 13) {
+                  watermarkText.text = imageViewerInputV;
+                }
               }
-            }
             "
             style="width: 240px"
           />

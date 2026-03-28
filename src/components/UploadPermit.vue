@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, defineProps, watch, reactive } from 'vue';
+import { onMounted, ref, watch, reactive } from 'vue';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import type { DrawerProps, UploadProps, UploadRequestOptions, UploadProgressEvent } from 'element-plus';
 import { userestStore } from '@/stores/rest';
@@ -166,8 +166,33 @@ const cueWord = `
 `;
 const direction = ref<DrawerProps['direction']>('rtl');
 const drawerSize = ref('30%');
-const fileList = ref<any>([]); // 选择的文件列表
-const fileCurrent = ref<any>({}); // 当前选择的文件
+const fileList = ref<any>([]); // 选择中的文件列表（含上传中/已上传）
+const uploadedFiles = ref<any>([]); // 已上传到 Strapi 的文件对象数组（用于提交和AI识别）
+const imgEditUrl = 'https://strapi.phrynus.cn'; // Strapi 静态资源地址
+
+// 拖拽排序状态
+const sortDragIndex = ref<number | null>(null);
+const sortDropIndex = ref<number | null>(null);
+
+/** 拖拽开始 */
+const onSortDragStart = (index: number) => {
+  sortDragIndex.value = index;
+};
+/** 拖拽经过 */
+const onSortDragOver = (_index: number) => {};
+/** 放下：交换顺序 */
+const onSortDrop = (dropIndex: number) => {
+  if (sortDragIndex.value === null || sortDragIndex.value === dropIndex) return;
+  const items = [...uploadedFiles.value];
+  const [dragged] = items.splice(sortDragIndex.value, 1);
+  items.splice(dropIndex, 0, dragged);
+  uploadedFiles.value = items;
+};
+/** 拖拽结束 */
+const onSortDragEnd = () => {
+  sortDragIndex.value = null;
+  sortDropIndex.value = null;
+};
 const company = ref<string>('');
 const time = ref<Date>();
 const form = ref({
@@ -178,38 +203,43 @@ const form = ref({
   ref: '',
 });
 
-// 图片选择变化时触发
+// 图片选择变化时触发（删除图片后）
 const handleImageRemove = (file: any, files: any) => {
-  if (files.length == 0) {
-    fileCurrent.value = undefined;
-    resetForm(); // 当移除所有图片时清空表单
+  // 从已上传列表中移除（Strapi 返回对象有 id）
+  if (file.response) {
+    const idx = uploadedFiles.value.findIndex((f: any) => f.id === file.response.id);
+    if (idx !== -1) uploadedFiles.value.splice(idx, 1);
+  }
+  // 全部清空才重置表单
+  if (uploadedFiles.value.length === 0) {
+    resetForm();
   }
 };
-const handleImageSuccess = async (response: any, file: any, fileList: any) => {
-  if (!siliconFlowStore.apiKey) {
-    return;
-  }
-  console.log(response);
-  fileCurrent.value = response[0] || response;
+const handleImageSuccess = async (response: any, file: any, files: any) => {
+  // 追加到已上传列表（支持多图）
+  const uploaded = Array.isArray(response) ? response[0] : response;
+  uploadedFiles.value.push(uploaded);
 
-  // 获取上传图片的URL
-  const imageUrl = `https://strapi.phrynus.cn${fileCurrent.value.url}`;
+  // if (!siliconFlowStore.apiKey) {
+  //   return;
+  // }
 
-  try {
-    // 调用硅基流动API进行图片识别
-    const result = await callSiliconFlowAPI(imageUrl);
-    if (result) {
-      // 根据API返回结果自动填充表单
-      autoFillForm(result);
-    }
-  } catch (error) {
-    console.error('图片识别失败:', error);
-    ElMessage({
-      message: '图片识别失败',
-      type: 'warning',
-      plain: true,
-    });
-  }
+  // // 全部已上传图片的 URL 一起送 AI 识别（支持多图）
+  // const imageUrls = uploadedFiles.value.map((f: any) => `${imgEditUrl}${f.url}`);
+
+  // try {
+  //   const result = await callSiliconFlowAPI(imageUrls);
+  //   if (result) {
+  //     autoFillForm(result);
+  //   }
+  // } catch (error) {
+  //   console.error('图片识别失败:', error);
+  //   ElMessage({
+  //     message: '图片识别失败',
+  //     type: 'warning',
+  //     plain: true,
+  //   });
+  // }
 };
 
 const uploadImage = (option: UploadRequestOptions) => {
@@ -249,7 +279,7 @@ const resetForm = () => {
   time.value = undefined;
 };
 
-const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
+const callSiliconFlowAPI = async (imageUrls: string | string[]): Promise<any> => {
   const loading = ElLoading.service({
     lock: true,
     text: '正在识别图片...',
@@ -259,7 +289,26 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
   // 在发送前清空表单
   resetForm();
 
+  // 统一转为数组
+  const urls = Array.isArray(imageUrls) ? imageUrls : [imageUrls];
+
   try {
+    const contentBlocks = [
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text' as const,
+            text: `请分析这张图片中的许可证信息；日期不可能超过${new Date().getFullYear()}年${new Date().getMonth() + 1}月${new Date().getDate()}号`,
+          },
+          ...urls.map((url) => ({
+            type: 'image_url' as const,
+            image_url: { url },
+          })),
+        ],
+      },
+    ];
+
     const response = await axios.post(
       'https://api.siliconflow.cn/v1/chat/completions',
       {
@@ -269,21 +318,7 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
             role: 'system',
             content: cueWord,
           },
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `请分析这张图片中的许可证信息;日期不可能超过${new Date().getFullYear()}年${new Date().getMonth() + 1}月${new Date().getDate()}号`,
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: imageUrl,
-                },
-              },
-            ],
-          },
+          ...contentBlocks,
         ],
         temperature: 0.7,
       },
@@ -339,9 +374,9 @@ const callSiliconFlowAPI = async (imageUrl: string): Promise<any> => {
   }
 };
 
-// 重新识别图片
+// 重新识别图片（使用全部已上传图片）
 const reidentifyImage = async () => {
-  if (!fileCurrent.value || !fileCurrent.value.url) {
+  if (uploadedFiles.value.length === 0) {
     ElMessage({
       message: '请先上传图片',
       type: 'warning',
@@ -351,8 +386,8 @@ const reidentifyImage = async () => {
   }
 
   try {
-    const imageUrl = `https://strapi.phrynus.cn${fileCurrent.value.url}`;
-    const result = await callSiliconFlowAPI(imageUrl);
+    const imageUrls = uploadedFiles.value.map((f: any) => `${imgEditUrl}${f.url}`);
+    const result = await callSiliconFlowAPI(imageUrls);
     if (result) {
       autoFillForm(result);
     }
@@ -519,7 +554,7 @@ const onSubmit = async () => {
     });
     return false;
   }
-  if (!fileCurrent.value) {
+  if (uploadedFiles.value.length === 0) {
     ElMessage({
       message: '等待图片上传',
       type: 'error',
@@ -541,7 +576,7 @@ const onSubmit = async () => {
         data: {
           company: company.value,
           type: form.value.type,
-          img: fileCurrent.value.id,
+          img: uploadedFiles.value.map((f: any) => f.id),
           types: form.value.types,
           area: form.value.area,
           time: dataTime,
@@ -573,7 +608,7 @@ const onSubmit = async () => {
       props.onClose();
       // 清空表单
       resetForm();
-      fileCurrent.value = undefined;
+      uploadedFiles.value = [];
       fileList.value = [];
     });
 };
@@ -628,7 +663,7 @@ onMounted(() => {
         </el-form-item>
         <el-form-item :locale="zhCn" label="图片:">
           <div class="image-selector">
-            <!-- 图片选择器 -->
+            <!-- 图片选择器：最多2张，支持多图上传 -->
             <el-upload
               action="https://strapi.phrynus.cn/api/upload"
               list-type="picture"
@@ -645,16 +680,40 @@ onMounted(() => {
               "
               :file-list="fileList"
               accept="image/*"
-              :multiple="false"
-              :limit="1"
+              :multiple="true"
+              :limit="2"
               :drag="true"
               name="files"
               :http-request="uploadImage"
             >
-              <div v-if="!fileCurrent || !fileCurrent.url" class="icoBox">
+              <div v-if="uploadedFiles.length < 2" class="icoBox">
                 <Icon name="iconshangchuan" />
               </div>
             </el-upload>
+
+            <!-- 图片拖拽排序区域（最多2张时才显示） -->
+            <div v-if="uploadedFiles.length === 2" class="image-sorter">
+              <div class="sorter-label">拖动可调整顺序（影响查看器展示顺序）</div>
+              <div class="sorter-list">
+                <div
+                  v-for="(file, index) in uploadedFiles"
+                  :key="file.id"
+                  class="sorter-item"
+                  draggable="true"
+                  @dragstart="onSortDragStart(Number(index))"
+                  @dragover.prevent="onSortDragOver(Number(index))"
+                  @drop="onSortDrop(Number(index))"
+                  @dragend="onSortDragEnd"
+                  :class="{ 'is-dragging': sortDragIndex === Number(index) }"
+                >
+                  <div class="sorter-item-inner">
+                    <el-image :src="imgEditUrl + file.url" fit="cover" class="sorter-thumb" />
+                    <div class="sorter-index">{{ Number(index) + 1 }}</div>
+                    <Icon name="icongengduo" class="sorter-icon" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </el-form-item>
 
@@ -671,10 +730,10 @@ onMounted(() => {
           </el-select>
         </el-form-item>
 
-        <el-form-item :locale="zhCn" v-if="fileCurrent && fileCurrent.url">
+        <el-form-item :locale="zhCn" v-if="uploadedFiles.length > 0">
           <el-button :locale="zhCn" @click="reidentifyImage" type="primary" plain style="width: 100%">
             <Icon name="iconshangchuan" style="margin-right: 5px" />
-            重新识别图片
+            识别图片
           </el-button>
         </el-form-item>
       </el-form>
@@ -697,6 +756,66 @@ onMounted(() => {
       font-size: 28px;
       color: #8c939d;
     }
+  }
+}
+
+.image-sorter {
+  margin-top: 10px;
+  .sorter-label {
+    font-size: 12px;
+    color: #909399;
+    margin-bottom: 6px;
+  }
+  .sorter-list {
+    display: flex;
+    gap: 8px;
+  }
+  .sorter-item {
+    cursor: grab;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+    &.is-dragging {
+      opacity: 0.4;
+    }
+    &:active {
+      cursor: grabbing;
+    }
+  }
+  .sorter-item-inner {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--el-border-color);
+  }
+  .sorter-thumb {
+    width: 100%;
+    height: 100%;
+  }
+  .sorter-index {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 11px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 18px;
+    text-align: center;
+  }
+  .sorter-icon {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    pointer-events: none;
   }
 }
 

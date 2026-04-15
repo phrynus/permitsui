@@ -392,7 +392,7 @@ const watermark = (text: string, blob: string, urlH: string): Promise<string> =>
  * @returns {Function} 防抖处理后的函数
  */
 function debounce(fn: Function, wait: number) {
-  let timeout: NodeJS.Timeout | undefined;
+  let timeout: any;
   return function (this: any, ...args: any[]) {
     const that = this;
     clearTimeout(timeout);

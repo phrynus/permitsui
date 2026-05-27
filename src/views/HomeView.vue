@@ -138,12 +138,12 @@ const getQuery = () => {
 
   // area (枚举, 精确匹配)
   if (store.areas) {
-    filterClauses.push({ area: { $eq: store.areas } });
+    filterClauses.push({ area: { $containsi: store.areas } });
   }
 
   // type (枚举前缀, 精确匹配)
   if (store.explore) {
-    filterClauses.push({ type: { $eq: store.explore } });
+    filterClauses.push({ type: { $containsi: store.explore } });
   }
 
   // company (字符串, 模糊匹配) - 仅在有输入时加入查询

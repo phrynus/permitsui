@@ -130,11 +130,10 @@ const getQuery = () => {
   // 构建过滤条件
   const filterClauses: any[] = [];
 
-  // types (multi-select, JSONB 数组) - 仅在有选择时加入查询
-  // 不使用 $contains（会生成 JSONB ~~ LIKE，PostgreSQL 不支持）
-  // 改用 $or + $eqi 对每个选中标签做精确匹配
+  // types (multi-select, JSON 数组) - 仅在有选择时加入查询
+  // Strapi 5 中 JSON 数组字段用 $containsi 检查数组是否包含指定元素
   if (store.tags) {
-    filterClauses.push({ types: { $eqi: store.tags } });
+    filterClauses.push({ types: { $containsi: store.tags } });
   }
 
   // area (枚举, 精确匹配)
